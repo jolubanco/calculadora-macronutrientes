@@ -31,7 +31,7 @@ public class UsuarioController {
 	
 	@GetMapping("/{idUsuario}")
 	public ResponseEntity<UsuarioDetalharDto> detalhaUsuario(@PathVariable Long idUsuario) {
-		return null;
+		return usuarioService.detalhaUsuario(idUsuario);
 	}
 	
 	@PostMapping
@@ -39,14 +39,19 @@ public class UsuarioController {
 		return usuarioService.cadastraUsuario(form, uriBuilder);
 	}
 	
-	@PostMapping("{idUsuario}/addRefeicao/{idRefeicao}")
+	@PostMapping("/{idUsuario}/addRefeicao/{idRefeicao}")
 	public ResponseEntity<UsuarioDto> cadastraRefeicao(@PathVariable("idUsuario") Long idUsuario, @PathVariable("idRefeicao") Long idRefeicao) {
 		return usuarioService.cadastraRefeicaoParaUsuario(idUsuario,idRefeicao);
 	}
 	
-	@PostMapping("{idUsuario}/addMacros/{idMacros}")
+	@PostMapping("/{idUsuario}/addMacros/{idMacros}")
 	public ResponseEntity<UsuarioDto> cadastraMacros(@PathVariable("idUsuario") Long idUsuario,@PathVariable("idMacros") Long idMacros){
 		return usuarioService.cadastraMacros(idUsuario,idMacros);
+	}
+	
+	@PostMapping("/{idUsuario}/addExercicio/{idExercicio}")
+	public ResponseEntity<UsuarioDto> cadastraExercicio(@PathVariable("idUsuario") Long idUsuario, @PathVariable("idExercicio") Long idExercicio){
+		return usuarioService.cadastraExercicio(idUsuario,idExercicio);
 	}
 
 }

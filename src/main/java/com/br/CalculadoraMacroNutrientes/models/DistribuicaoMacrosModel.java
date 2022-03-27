@@ -6,11 +6,15 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import com.br.CalculadoraMacroNutrientes.controllers.dtos.DistribuicaoMacrosDto;
+
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name="TB_DSTB_MACROS")
 @Data
+@NoArgsConstructor
 public class DistribuicaoMacrosModel {
 	
 	@Id
@@ -25,5 +29,9 @@ public class DistribuicaoMacrosModel {
 		this.carboidrato = carboidrato;
 		this.proteina = proteina;
 		this.gordura = gordura;
+	}
+
+	public DistribuicaoMacrosDto converterDto() {
+		return new DistribuicaoMacrosDto(carboidrato,proteina,gordura,calorias);
 	}
 }

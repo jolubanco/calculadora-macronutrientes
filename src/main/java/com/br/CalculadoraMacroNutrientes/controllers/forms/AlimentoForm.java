@@ -8,11 +8,11 @@ import lombok.Data;
 @Data
 public class AlimentoForm {
 	
-	private Long id;
+	private String id;
 	private double quantidadeInformada;
 	
 	public AlimentoModel converter(AlimentoService alimentoService) {	
-		return alimentoService.calcularMacrosDoAlimento(id, quantidadeInformada);
+		return alimentoService.calcularMacrosDoAlimento(Long.parseLong(id), quantidadeInformada);
 	}
 
 }

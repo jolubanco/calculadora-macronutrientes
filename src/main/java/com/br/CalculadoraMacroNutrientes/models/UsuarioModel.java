@@ -14,10 +14,12 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name="TB_USR")
 @Data
+@NoArgsConstructor
 public class UsuarioModel {
 	
 	@Id
@@ -35,8 +37,6 @@ public class UsuarioModel {
 	private List<RefeicaoModel> refeicoes = new ArrayList<>();
 	@OneToMany
 	private List<ExercicioModel> exercicios = new ArrayList<>();
-	
-	public UsuarioModel() {}
 	
 	public UsuarioModel(String nome,ObjetivoEnumModel objetivo,InformacoesUsuarioModel informacoesUsuario) {
 		this.nome = nome;

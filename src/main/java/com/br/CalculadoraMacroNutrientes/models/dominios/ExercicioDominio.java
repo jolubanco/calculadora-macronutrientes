@@ -7,10 +7,12 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name="TB_EXR_DOM")
 @Data
+@NoArgsConstructor
 public class ExercicioDominio {
 	
 	@Id
@@ -19,4 +21,10 @@ public class ExercicioDominio {
 	private String modalidade;
 	private double tempo = 0.0;
 	private double caloriasGastas = 0.0;
+	
+	public ExercicioDominio (String modalidade, double tempo, double caloriasGastas) {
+		this.modalidade = modalidade;
+		this.tempo = tempo;
+		this.caloriasGastas = caloriasGastas;
+	}
 }

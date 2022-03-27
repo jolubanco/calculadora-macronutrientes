@@ -18,4 +18,13 @@ public class DistribuicaoMacrosDto {
 		this.gordura = distruicaoMacros.getGordura();
 	}
 
+	public DistribuicaoMacrosDto(double carboidrato, double proteina, double gordura, double calorias) {
+		this.carboidrato = carboidrato;
+		this.proteina = proteina;
+		this.gordura = gordura;
+		this.calorias = calorias;
+	}
+	
+	
+
 }

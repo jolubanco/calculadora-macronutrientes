@@ -11,11 +11,15 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import com.br.CalculadoraMacroNutrientes.controllers.dtos.RefeicaoDto;
+
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name="TB_REF")
 @Data
+@NoArgsConstructor
 public class RefeicaoModel {
 	
 	@Id
@@ -29,8 +33,6 @@ public class RefeicaoModel {
 	private LocalDate dataCriacao = LocalDate.now();
 	@OneToMany
 	private List<AlimentoModel> alimentos = new ArrayList<>();
-	
-	public RefeicaoModel() {}
 	
 	public RefeicaoModel(String nome) {
 		this.nome = nome;
@@ -50,6 +52,14 @@ public class RefeicaoModel {
 	
 	public void adicionaCalorias(double caloria) {
 		this.caloriasTotais += caloria;
+	}
+	
+	public static List<RefeicaoDto> converterDto(List<RefeicaoModel> listaRefeicao ) {
+		List<RefeicaoDto> listaDto = new ArrayList<RefeicaoDto>();
+		listaRefeicao.forEach(refeicao -> {
+			listaDto.add(new RefeicaoDto(refeicao));
+		});
+		return listaDto;
 	}
 
 }

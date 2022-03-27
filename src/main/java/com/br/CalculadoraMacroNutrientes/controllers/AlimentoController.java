@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.br.CalculadoraMacroNutrientes.controllers.dtos.AlimentoDetalharDto;
 import com.br.CalculadoraMacroNutrientes.controllers.dtos.AlimentoDto;
 import com.br.CalculadoraMacroNutrientes.controllers.forms.AlimentoForm;
 import com.br.CalculadoraMacroNutrientes.services.AlimentoService;
@@ -22,7 +23,7 @@ public class AlimentoController {
 	private AlimentoService alimentoService;
 	
 	@GetMapping("/{idAlimento}")
-	public ResponseEntity<AlimentoDto> detalhaAlimento(@PathVariable Long idAlimento) {
+	public ResponseEntity<AlimentoDetalharDto> detalhaAlimento(@PathVariable Long idAlimento) {
 		return alimentoService.detalhaAlimento(idAlimento);
 	}
 	

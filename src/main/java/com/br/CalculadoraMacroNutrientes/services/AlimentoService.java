@@ -3,10 +3,12 @@ package com.br.CalculadoraMacroNutrientes.services;
 import java.net.URI;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.br.CalculadoraMacroNutrientes.controllers.dtos.AlimentoDetalharDto;
 import com.br.CalculadoraMacroNutrientes.controllers.dtos.AlimentoDto;
 import com.br.CalculadoraMacroNutrientes.controllers.forms.AlimentoForm;
 import com.br.CalculadoraMacroNutrientes.models.AlimentoModel;
@@ -20,6 +22,7 @@ public class AlimentoService {
 	private AlimentoDominioRepository alimentoDominioRepository;
 	private AlimentoRepository alimentoRepository;
 	
+	@Autowired
 	public AlimentoService (AlimentoDominioRepository alimentoDominioRepository,AlimentoRepository alimentoRepository) {
 		this.alimentoDominioRepository = alimentoDominioRepository;
 		this.alimentoRepository = alimentoRepository;
@@ -38,9 +41,8 @@ public class AlimentoService {
 			double gordura = (alimentoReferencia.get().getGordura()*quantidadeInformada)/alimentoReferencia.get().getQuantidade();
 			double calorias = (alimentoReferencia.get().getCalorias()*quantidadeInformada)/alimentoReferencia.get().getQuantidade();
 			
-			AlimentoModel alimento = new AlimentoModel(nome,quantidadeInformada,carboidrato,proteina,gordura,calorias);
-			alimentoRepository.save(alimento);
-			return alimento;
+			return new AlimentoModel(nome,quantidadeInformada,carboidrato,proteina,gordura,calorias);
+	
 		} else {
 			return null;
 		}
@@ -57,10 +59,10 @@ public class AlimentoService {
 		return ResponseEntity.created(uri).body(new AlimentoDto(alimento));
 	}
 
-	public ResponseEntity<AlimentoDto> detalhaAlimento(Long idAlimento) {	
+	public ResponseEntity<AlimentoDetalharDto> detalhaAlimento(Long idAlimento) {	
 		Optional<AlimentoModel> alimento = alimentoRepository.findById(idAlimento);
 		if(alimento.isPresent()) {
-			return ResponseEntity.ok(new AlimentoDto(alimento.get()));
+			return ResponseEntity.ok(new AlimentoDetalharDto(alimento.get()));
 		} else {
 			return ResponseEntity.notFound().build();	
 		}

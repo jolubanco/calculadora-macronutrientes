@@ -10,13 +10,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.br.CalculadoraMacroNutrientes.controllers.dtos.UsuarioDetalharDto;
 import com.br.CalculadoraMacroNutrientes.controllers.dtos.UsuarioDto;
 import com.br.CalculadoraMacroNutrientes.controllers.forms.UsuarioForm;
 import com.br.CalculadoraMacroNutrientes.models.DistribuicaoMacrosModel;
+import com.br.CalculadoraMacroNutrientes.models.ExercicioModel;
 import com.br.CalculadoraMacroNutrientes.models.RefeicaoModel;
 import com.br.CalculadoraMacroNutrientes.models.SexoEnumModel;
 import com.br.CalculadoraMacroNutrientes.models.UsuarioModel;
 import com.br.CalculadoraMacroNutrientes.repositories.DistribuicaoMacrosRepository;
+import com.br.CalculadoraMacroNutrientes.repositories.ExercicioRepository;
 import com.br.CalculadoraMacroNutrientes.repositories.InformacoesUsuarioRepository;
 import com.br.CalculadoraMacroNutrientes.repositories.RefeicaoRepository;
 import com.br.CalculadoraMacroNutrientes.repositories.UsuarioRepository;
@@ -28,17 +31,21 @@ public class UsuarioService {
 	private InformacoesUsuarioRepository informacoesUsuarioRepository;
 	private RefeicaoRepository refeicaoRepository; 
 	private DistribuicaoMacrosRepository distribuicaoMacrosRepository;
+	private ExercicioRepository exercicioRepository;
 	
 	@Autowired
 	public UsuarioService(UsuarioRepository usuarioRepository,
 			InformacoesUsuarioRepository informacoesUsuarioRepository,
 			RefeicaoRepository refeicaoRepository,
-			DistribuicaoMacrosRepository distribuicaoMacrosRepository) 
+			DistribuicaoMacrosRepository distribuicaoMacrosRepository,
+			ExercicioRepository exercicioRepository
+			)
 	{
 		this.usuarioRepository = usuarioRepository;
 		this.informacoesUsuarioRepository = informacoesUsuarioRepository;
 		this.refeicaoRepository = refeicaoRepository;
 		this.distribuicaoMacrosRepository = distribuicaoMacrosRepository;
+		this.exercicioRepository = exercicioRepository;
 	}
 	
 	public UsuarioService() {}
@@ -72,12 +79,20 @@ public class UsuarioService {
 	public ResponseEntity<UsuarioDto> cadastraUsuario(UsuarioForm form, UriComponentsBuilder uriBuilder) {
 		
 		UsuarioModel usuario = form.converter(informacoesUsuarioRepository);
+		calculaDistribuicaoDeMacros(usuario);
         calculaTaxaMetabolismoBasal(usuario);
 		usuarioRepository.save(usuario);
 		
         URI uri = uriBuilder.path("/usuarios/{id}").buildAndExpand(usuario.getId()).toUri();
         
 		return ResponseEntity.created(uri).body(new UsuarioDto(usuario));
+	}
+
+	private void calculaDistribuicaoDeMacros(UsuarioModel usuario) {
+		DistribuicaoMacrosModel distribuicaoMacros = new DistribuicaoMacrosModel(0,0,0);
+		distribuicaoMacrosRepository.save(distribuicaoMacros);
+		usuario.setDistribruicaoMacros(distribuicaoMacros);
+		usuarioRepository.save(usuario);
 	}
 
 	public ResponseEntity<UsuarioDto> cadastraRefeicaoParaUsuario(Long idUsuario, Long idRefeicao) {
@@ -88,6 +103,7 @@ public class UsuarioService {
 		if(usuario.isPresent() && refeicao.isPresent()) {
 			
 			usuario.get().getRefeicoes().add(refeicao.get());
+			usuarioRepository.save(usuario.get());
 			return ResponseEntity.ok(new UsuarioDto(usuario.get()));
 			
 		} else {
@@ -101,6 +117,29 @@ public class UsuarioService {
 		
 		if(usuario.isPresent() && distribuicaoMacros.isPresent()) {
 			usuario.get().setDistribruicaoMacros(distribuicaoMacros.get());
+			usuarioRepository.save(usuario.get());
+			return ResponseEntity.ok(new UsuarioDto(usuario.get()));
+		} else {
+			return ResponseEntity.notFound().build();
+		}
+	}
+
+	public ResponseEntity<UsuarioDetalharDto> detalhaUsuario(Long idUsuario) {
+		Optional<UsuarioModel> usuario = usuarioRepository.findById(idUsuario);
+		if(usuario.isPresent()) {
+			return ResponseEntity.ok(new UsuarioDetalharDto(usuario.get()));
+		} else {
+			return ResponseEntity.notFound().build();
+		}
+	}
+
+	public ResponseEntity<UsuarioDto> cadastraExercicio(Long idUsuario, Long idExercicio) {
+		
+		Optional<UsuarioModel> usuario = usuarioRepository.findById(idUsuario);
+		Optional<ExercicioModel> exercicio = exercicioRepository.findById(idExercicio);
+		
+		if(usuario.isPresent() && exercicio.isPresent()) {
+			usuario.get().getExercicios().add(exercicio.get());
 			usuarioRepository.save(usuario.get());
 			return ResponseEntity.ok(new UsuarioDto(usuario.get()));
 		} else {

@@ -7,10 +7,12 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name="TB_ALM")
 @Data
+@NoArgsConstructor
 public class AlimentoModel {
 	
 	@Id
@@ -22,8 +24,6 @@ public class AlimentoModel {
 	private double proteina;
 	private double gordura;
 	private double calorias;
-	
-	public AlimentoModel() {}
 	
 	public AlimentoModel(String nome, double quantidade, double carboidrato, double proteina, double gordura, double calorias) {
 		this.nome = nome;

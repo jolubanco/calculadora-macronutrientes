@@ -20,13 +20,11 @@ public class UsuarioDto {
 	private String nome;
 	@Enumerated(EnumType.STRING)
 	private ObjetivoEnumModel objetivo;
-	private List<RefeicaoModel> refeicoes; //corrigir para RefeicaoDto
 	
 	public UsuarioDto(UsuarioModel usuario) {
 		this.id = usuario.getId();
 		this.nome = usuario.getNome();
 		this.objetivo = usuario.getObjetivo();
-		this.refeicoes = usuario.getRefeicoes(); //nao está devolvendo a lista de alimentos
 	}
 
 	public static Page<UsuarioDto> converter(Page<UsuarioModel> usuarios) {
