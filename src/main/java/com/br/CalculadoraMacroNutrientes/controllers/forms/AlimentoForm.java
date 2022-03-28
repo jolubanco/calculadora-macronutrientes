@@ -9,10 +9,10 @@ import lombok.Data;
 public class AlimentoForm {
 	
 	private String id;
-	private double quantidadeInformada;
+	private double quantidade;
 	
 	public AlimentoModel converter(AlimentoService alimentoService) {	
-		return alimentoService.calcularMacrosDoAlimento(Long.parseLong(id), quantidadeInformada);
+		return alimentoService.calcularMacrosDoAlimento(Long.parseLong(id), quantidade);
 	}
 
 }
