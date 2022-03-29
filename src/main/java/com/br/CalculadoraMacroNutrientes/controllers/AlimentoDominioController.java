@@ -17,6 +17,8 @@ import com.br.CalculadoraMacroNutrientes.controllers.dtos.AlimentoDominioDto;
 import com.br.CalculadoraMacroNutrientes.controllers.forms.AlimentoDominioForm;
 import com.br.CalculadoraMacroNutrientes.services.AlimentoDominioService;
 
+import io.swagger.annotations.ApiOperation;
+
 @RestController
 @RequestMapping("/alimentosDominio")
 public class AlimentoDominioController {
@@ -34,6 +36,7 @@ public class AlimentoDominioController {
 		return alimentoDominioService.detalhaAlimentoDominio(idAlimentoDominio);	
 	}
 	
+	@ApiOperation(value = "Cadastra um alimento de referência")
 	@PostMapping
 	public ResponseEntity<AlimentoDominioDetalharDto> cadastraAlimentoDominio(@RequestBody AlimentoDominioForm form, UriComponentsBuilder uriBuilder){
 		return alimentoDominioService.cadastraAlimentoDominio(form,uriBuilder);
