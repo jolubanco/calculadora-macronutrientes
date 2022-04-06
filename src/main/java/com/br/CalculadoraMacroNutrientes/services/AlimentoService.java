@@ -36,10 +36,10 @@ public class AlimentoService {
 			
 			String nome = alimentoReferencia.get().getNome();
 			//necessario tratamento para não dividir por 0
-			double carboidrato = (alimentoReferencia.get().getCarboidrato()*quantidadeInformada)/alimentoReferencia.get().getQuantidade();
-			double proteina = (alimentoReferencia.get().getProteina()*quantidadeInformada)/alimentoReferencia.get().getQuantidade();
-			double gordura = (alimentoReferencia.get().getGordura()*quantidadeInformada)/alimentoReferencia.get().getQuantidade();
-			double calorias = (alimentoReferencia.get().getCalorias()*quantidadeInformada)/alimentoReferencia.get().getQuantidade();
+			double carboidrato = (alimentoReferencia.get().getCarboidrato()*quantidadeInformada)/(alimentoReferencia.get().getQuantidade());
+			double proteina = (alimentoReferencia.get().getProteina()*quantidadeInformada)/(alimentoReferencia.get().getQuantidade());
+			double gordura = (alimentoReferencia.get().getGordura()*quantidadeInformada)/(alimentoReferencia.get().getQuantidade());
+			double calorias = (alimentoReferencia.get().getCalorias()*quantidadeInformada)/(alimentoReferencia.get().getQuantidade());
 			
 			return new AlimentoModel(nome,quantidadeInformada,carboidrato,proteina,gordura,calorias);
 	
