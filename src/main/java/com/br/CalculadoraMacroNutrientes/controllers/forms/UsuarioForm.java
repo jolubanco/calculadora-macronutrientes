@@ -7,15 +7,18 @@ import com.br.CalculadoraMacroNutrientes.models.UsuarioModel;
 import com.br.CalculadoraMacroNutrientes.repositories.InformacoesUsuarioRepository;
 
 import lombok.Data;
+import lombok.NonNull;
 
 @Data
 public class UsuarioForm {
 	
 	private String nome;
+	@NonNull
 	private String objetivo; //(ENUM) validar o envio
 	private double peso;
 	private double altura;
 	private int idade;
+	@NonNull
 	private String sexo; //(ENUM) validar o envio
 
 	public UsuarioModel converter(InformacoesUsuarioRepository informacoesUsuarioRepository) {

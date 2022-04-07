@@ -17,6 +17,8 @@ import com.br.CalculadoraMacroNutrientes.controllers.dtos.UsuarioDto;
 import com.br.CalculadoraMacroNutrientes.controllers.forms.UsuarioForm;
 import com.br.CalculadoraMacroNutrientes.services.UsuarioService;
 
+import io.swagger.annotations.ApiOperation;
+
 @RestController
 @RequestMapping("/usuarios")
 public class UsuarioController {
@@ -44,6 +46,7 @@ public class UsuarioController {
 		return usuarioService.cadastraRefeicaoParaUsuario(idUsuario,idRefeicao);
 	}
 	
+	@ApiOperation(value = "Cadastra os macronutrientes informados pelo usuário")
 	@PostMapping("/{idUsuario}/addMacros/{idMacros}")
 	public ResponseEntity<UsuarioDto> cadastraMacros(@PathVariable("idUsuario") Long idUsuario,@PathVariable("idMacros") Long idMacros){
 		return usuarioService.cadastraMacros(idUsuario,idMacros);
@@ -52,6 +55,12 @@ public class UsuarioController {
 	@PostMapping("/{idUsuario}/addExercicio/{idExercicio}")
 	public ResponseEntity<UsuarioDto> cadastraExercicio(@PathVariable("idUsuario") Long idUsuario, @PathVariable("idExercicio") Long idExercicio){
 		return usuarioService.cadastraExercicio(idUsuario,idExercicio);
+	}
+	
+	@PostMapping("/calcCalorias/{idUsuario}")
+	public ResponseEntity<UsuarioDto> cadastraCaloriasDiarias(@PathVariable("idUsuario") Long idUsuario){
+		return usuarioService.cadastraCaloriasDiarias(idUsuario);
+		
 	}
 
 }

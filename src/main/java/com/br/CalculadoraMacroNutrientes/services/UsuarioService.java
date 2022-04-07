@@ -1,6 +1,7 @@
 package com.br.CalculadoraMacroNutrientes.services;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ import com.br.CalculadoraMacroNutrientes.controllers.dtos.UsuarioDto;
 import com.br.CalculadoraMacroNutrientes.controllers.forms.UsuarioForm;
 import com.br.CalculadoraMacroNutrientes.models.DistribuicaoMacrosModel;
 import com.br.CalculadoraMacroNutrientes.models.ExercicioModel;
+import com.br.CalculadoraMacroNutrientes.models.ObjetivoEnumModel;
 import com.br.CalculadoraMacroNutrientes.models.RefeicaoModel;
 import com.br.CalculadoraMacroNutrientes.models.SexoEnumModel;
 import com.br.CalculadoraMacroNutrientes.models.UsuarioModel;
@@ -79,8 +81,8 @@ public class UsuarioService {
 	public ResponseEntity<UsuarioDto> cadastraUsuario(UsuarioForm form, UriComponentsBuilder uriBuilder) {
 		
 		UsuarioModel usuario = form.converter(informacoesUsuarioRepository);
-		calculaDistribuicaoDeMacros(usuario);
-        calculaTaxaMetabolismoBasal(usuario);
+        calculaDistribuicaoMacroNutrientes(usuario);
+		calculaTaxaMetabolismoBasal(usuario);
 		usuarioRepository.save(usuario);
 		
         URI uri = uriBuilder.path("/usuarios/{id}").buildAndExpand(usuario.getId()).toUri();
@@ -88,11 +90,32 @@ public class UsuarioService {
 		return ResponseEntity.created(uri).body(new UsuarioDto(usuario));
 	}
 
-	private void calculaDistribuicaoDeMacros(UsuarioModel usuario) {
-		DistribuicaoMacrosModel distribuicaoMacros = new DistribuicaoMacrosModel(0,0,0);
-		distribuicaoMacrosRepository.save(distribuicaoMacros);
-		usuario.setDistribruicaoMacros(distribuicaoMacros);
-		usuarioRepository.save(usuario);
+	private void calculaDistribuicaoMacroNutrientes(UsuarioModel usuario) {
+		
+		if(usuario.getObjetivo() == ObjetivoEnumModel.GANHO_PESO) {
+			
+			double carboidrato = 5 * usuario.getInformacoesUsuario().getPeso();
+			double proteina = 2 * usuario.getInformacoesUsuario().getPeso();
+			double gordura = 1 * usuario.getInformacoesUsuario().getPeso();
+			
+			DistribuicaoMacrosModel distribuicaoMacros = new DistribuicaoMacrosModel(carboidrato,proteina,gordura);
+			distribuicaoMacrosRepository.save(distribuicaoMacros);
+			usuario.setDistribruicaoMacros(distribuicaoMacros);
+			usuarioRepository.save(usuario);
+			
+		} else if(usuario.getObjetivo() == ObjetivoEnumModel.PERDA_PESO) {
+			
+			double carboidrato = 3 * usuario.getInformacoesUsuario().getPeso();
+			double proteina = 2 * usuario.getInformacoesUsuario().getPeso();
+			double gordura = 1 * usuario.getInformacoesUsuario().getPeso();
+			
+			DistribuicaoMacrosModel distribuicaoMacros = new DistribuicaoMacrosModel(carboidrato,proteina,gordura);
+			distribuicaoMacrosRepository.save(distribuicaoMacros);
+			usuario.setDistribruicaoMacros(distribuicaoMacros);
+			usuarioRepository.save(usuario);
+			
+		}
+		
 	}
 
 	public ResponseEntity<UsuarioDto> cadastraRefeicaoParaUsuario(Long idUsuario, Long idRefeicao) {
@@ -146,5 +169,36 @@ public class UsuarioService {
 			return ResponseEntity.notFound().build();
 		}
 	}
+	
+	public static void calculaCaloriasDiarias(UsuarioModel usuario) {
+			
+			List<ExercicioModel> exercicios = usuario.getExercicios();
+			double metabolismoBasal = usuario.getTaxaMetabolismoBasal();
+			
+			usuario.getDistribruicaoMacros().adicionarCaloria(metabolismoBasal);
+			
+			exercicios.forEach(exercicio -> {
+				usuario.getDistribruicaoMacros().adicionarCaloria(exercicio.getCaloriasGastas());
+			});
+			
+			if(usuario.getObjetivo() == ObjetivoEnumModel.GANHO_PESO) {
+				usuario.getDistribruicaoMacros().adicionarCaloria(500);
+			} else if (usuario.getObjetivo() == ObjetivoEnumModel.PERDA_PESO) {
+				usuario.getDistribruicaoMacros().adicionarCaloria(-500);
+			}
+	}
 
+	public ResponseEntity<UsuarioDto> cadastraCaloriasDiarias(Long idUsuario) {
+		
+		Optional<UsuarioModel> usuario = usuarioRepository.findById(idUsuario);
+		
+		if(usuario.isPresent()) {
+			calculaCaloriasDiarias(usuario.get());
+			usuarioRepository.save(usuario.get());
+			return ResponseEntity.ok(new UsuarioDto(usuario.get()));
+		} else {
+			return ResponseEntity.notFound().build();
+		}
+
+}
 }

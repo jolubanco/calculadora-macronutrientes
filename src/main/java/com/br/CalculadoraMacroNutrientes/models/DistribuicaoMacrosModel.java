@@ -34,4 +34,8 @@ public class DistribuicaoMacrosModel {
 	public DistribuicaoMacrosDto converterDto() {
 		return new DistribuicaoMacrosDto(carboidrato,proteina,gordura,calorias);
 	}
+	
+	public void adicionarCaloria(double caloria) {
+		calorias += caloria;
+	}
 }
