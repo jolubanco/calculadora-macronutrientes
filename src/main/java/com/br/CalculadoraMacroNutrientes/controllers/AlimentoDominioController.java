@@ -26,17 +26,19 @@ public class AlimentoDominioController {
 	@Autowired
 	private AlimentoDominioService alimentoDominioService;
 	
+	@ApiOperation(value = "Lista todos os alimentos de domínio cadastrados")
 	@GetMapping
 	public List<AlimentoDominioDto> listaAlimentos(){
 		return null;	
 	}
 	
+	@ApiOperation(value = "Detalha o alimento de domínio cadastrado")
 	@GetMapping("/{idAlimentoDominio}")
 	public ResponseEntity<AlimentoDominioDetalharDto> detalhaALimentoDominio(@PathVariable Long idAlimentoDominio){
 		return alimentoDominioService.detalhaAlimentoDominio(idAlimentoDominio);	
 	}
 	
-	@ApiOperation(value = "Cadastra um alimento de referência")
+	@ApiOperation(value = "Cadastra um alimento de domínio")
 	@PostMapping
 	public ResponseEntity<AlimentoDominioDetalharDto> cadastraAlimentoDominio(@RequestBody AlimentoDominioForm form, UriComponentsBuilder uriBuilder){
 		return alimentoDominioService.cadastraAlimentoDominio(form,uriBuilder);

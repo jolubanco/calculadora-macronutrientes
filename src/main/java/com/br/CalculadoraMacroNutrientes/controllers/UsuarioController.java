@@ -26,38 +26,44 @@ public class UsuarioController {
 	@Autowired
 	private UsuarioService usuarioService;
 	
+	@ApiOperation(value = "Lista todos os usuários cadastrados")
 	@GetMapping
 	public Page<UsuarioDto> listaUsuarios(Pageable paginacao) {
 		return usuarioService.listaUsuarios(paginacao);	
 	}
 	
+	@ApiOperation(value = "Detalha informações do usuário")
 	@GetMapping("/{idUsuario}")
 	public ResponseEntity<UsuarioDetalharDto> detalhaUsuario(@PathVariable Long idUsuario) {
 		return usuarioService.detalhaUsuario(idUsuario);
 	}
 	
+	@ApiOperation(value = "Cadastra um usuário e calcula a taxa de matabolismo basal e a distribuição de macronutrientes de acordo com o objetivo")
 	@PostMapping
 	public ResponseEntity<UsuarioDto> cadastraUsuario(@RequestBody UsuarioForm form, UriComponentsBuilder uriBuilder) {
 		return usuarioService.cadastraUsuario(form, uriBuilder);
 	}
 	
+	@ApiOperation(value = "Associa uma refeição ao usuário a partir da lista já cadastrada")
 	@PostMapping("/{idUsuario}/addRefeicao/{idRefeicao}")
 	public ResponseEntity<UsuarioDto> cadastraRefeicao(@PathVariable("idUsuario") Long idUsuario, @PathVariable("idRefeicao") Long idRefeicao) {
 		return usuarioService.cadastraRefeicaoParaUsuario(idUsuario,idRefeicao);
 	}
 	
-	@ApiOperation(value = "Cadastra os macronutrientes informados pelo usuário")
+	@ApiOperation(value = "Associa os macronutrientes informados pelo usuário a partir da lista já cadastrada")
 	@PostMapping("/{idUsuario}/addMacros/{idMacros}")
 	public ResponseEntity<UsuarioDto> cadastraMacros(@PathVariable("idUsuario") Long idUsuario,@PathVariable("idMacros") Long idMacros){
 		return usuarioService.cadastraMacros(idUsuario,idMacros);
 	}
 	
+	@ApiOperation(value = "Associa um exercício ao usuário a partir da lista já cadastrada")
 	@PostMapping("/{idUsuario}/addExercicio/{idExercicio}")
 	public ResponseEntity<UsuarioDto> cadastraExercicio(@PathVariable("idUsuario") Long idUsuario, @PathVariable("idExercicio") Long idExercicio){
 		return usuarioService.cadastraExercicio(idUsuario,idExercicio);
 	}
 	
-	@PostMapping("/calcCalorias/{idUsuario}")
+	@ApiOperation(value = "Calcula as calorias diárias necessárias a partir das informações cadastradas de exercícios e metabolismo basal")
+	@PostMapping("/{idUsuario}/calorias")
 	public ResponseEntity<UsuarioDto> cadastraCaloriasDiarias(@PathVariable("idUsuario") Long idUsuario){
 		return usuarioService.cadastraCaloriasDiarias(idUsuario);
 		

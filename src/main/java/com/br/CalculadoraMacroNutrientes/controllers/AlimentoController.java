@@ -15,6 +15,8 @@ import com.br.CalculadoraMacroNutrientes.controllers.dtos.AlimentoDto;
 import com.br.CalculadoraMacroNutrientes.controllers.forms.AlimentoForm;
 import com.br.CalculadoraMacroNutrientes.services.AlimentoService;
 
+import io.swagger.annotations.ApiOperation;
+
 @RestController
 @RequestMapping("/alimentos")
 public class AlimentoController {
@@ -22,11 +24,13 @@ public class AlimentoController {
 	@Autowired
 	private AlimentoService alimentoService;
 	
+	@ApiOperation(value = "Detalha um alimento cadastrado")
 	@GetMapping("/{idAlimento}")
 	public ResponseEntity<AlimentoDetalharDto> detalhaAlimento(@PathVariable Long idAlimento) {
 		return alimentoService.detalhaAlimento(idAlimento);
 	}
 	
+	@ApiOperation(value = "Cadastra um alimento a partir dos alimentos de domínio")
 	@PostMapping
 	public ResponseEntity<AlimentoDto> cadastraAlimento(@RequestBody AlimentoForm form,UriComponentsBuilder uriBuilder) {
 		return alimentoService.cadastraAlimento(form, uriBuilder);

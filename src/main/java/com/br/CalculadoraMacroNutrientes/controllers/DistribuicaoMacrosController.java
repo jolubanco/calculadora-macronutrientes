@@ -13,7 +13,7 @@ import com.br.CalculadoraMacroNutrientes.controllers.forms.MacrosForm;
 import com.br.CalculadoraMacroNutrientes.services.DistribuicaoMacrosService;
 
 import io.swagger.annotations.ApiOperation;
-//nao esta aparecendo no swagger
+
 @RestController
 @RequestMapping("/macros")
 public class DistribuicaoMacrosController {
