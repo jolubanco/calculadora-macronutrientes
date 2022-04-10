@@ -14,6 +14,10 @@ O usuáriio poderá cadastrar:
   - uma lista de exercícios
   - utilizar a sugestão de macronutrientes um definir a sua própria distribuição
 
+## Novas Funcionalidades
+ - Refatorar a forma como é calculada a quantidade de calorias diárias necessárias para levar em consideração o fator de exercicio e ter um valor mais 
+fiel . [Exemplo](https://www.tuasaude.com/como-calcular-o-gasto-calorico/#:~:text=Exemplo%20de%20c%C3%A1lculo%20de%20ingest%C3%A3o%20cal%C3%B3rica%20di%C3%A1ria&text=Gasto%20energ%C3%A9tico%20basal%3A%20])
+
 ## Payload das requisições disponíveis
 
 ### Cadastro de um usuario 
