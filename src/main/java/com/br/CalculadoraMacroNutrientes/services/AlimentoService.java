@@ -1,6 +1,7 @@
 package com.br.CalculadoraMacroNutrientes.services;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,5 +67,10 @@ public class AlimentoService {
 		} else {
 			return ResponseEntity.notFound().build();	
 		}
+	}
+
+	public ResponseEntity<List<AlimentoDto>> listaAlimentos() {
+		List<AlimentoModel> alimentos = alimentoRepository.findAll();
+		return ResponseEntity.ok(AlimentoDto.converter(alimentos));
 	}
 }

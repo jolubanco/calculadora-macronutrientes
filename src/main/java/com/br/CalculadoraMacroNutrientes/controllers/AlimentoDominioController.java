@@ -28,13 +28,13 @@ public class AlimentoDominioController {
 	
 	@ApiOperation(value = "Lista todos os alimentos de domínio cadastrados")
 	@GetMapping
-	public List<AlimentoDominioDto> listaAlimentos(){
-		return null;	
+	public ResponseEntity<List<AlimentoDominioDto>> listaAlimentos(){
+		return alimentoDominioService.listaAlimentos();	
 	}
 	
 	@ApiOperation(value = "Detalha o alimento de domínio cadastrado")
 	@GetMapping("/{idAlimentoDominio}")
-	public ResponseEntity<AlimentoDominioDetalharDto> detalhaALimentoDominio(@PathVariable Long idAlimentoDominio){
+	public ResponseEntity<AlimentoDominioDetalharDto> detalhaALimentoDominio(@PathVariable("idAlimentoDominio") Long idAlimentoDominio){
 		return alimentoDominioService.detalhaAlimentoDominio(idAlimentoDominio);	
 	}
 	

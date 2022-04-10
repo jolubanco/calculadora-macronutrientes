@@ -1,5 +1,7 @@
 package com.br.CalculadoraMacroNutrientes.controllers;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,6 +25,12 @@ public class AlimentoController {
 	
 	@Autowired
 	private AlimentoService alimentoService;
+	
+	@ApiOperation(value = "Lista todos os alimentos cadastrados")
+	@GetMapping
+	public ResponseEntity<List<AlimentoDto>> listaAlimentos(){
+		return alimentoService.listaAlimentos();	
+	}
 	
 	@ApiOperation(value = "Detalha um alimento cadastrado")
 	@GetMapping("/{idAlimento}")

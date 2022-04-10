@@ -83,11 +83,17 @@ public class UsuarioService {
 		UsuarioModel usuario = form.converter(informacoesUsuarioRepository);
         calculaDistribuicaoMacroNutrientes(usuario);
 		calculaTaxaMetabolismoBasal(usuario);
+		calculaCaloriasNecessarias(usuario);
+		defineCaloriasRestantes(usuario);
 		usuarioRepository.save(usuario);
 		
         URI uri = uriBuilder.path("/usuarios/{id}").buildAndExpand(usuario.getId()).toUri();
         
 		return ResponseEntity.created(uri).body(new UsuarioDto(usuario));
+	}
+
+	private void defineCaloriasRestantes(UsuarioModel usuario) {
+		usuario.getDistribruicaoMacros().setCaloriasRestantes(usuario.getDistribruicaoMacros().getCaloriasNecessarias());;	
 	}
 
 	private void calculaDistribuicaoMacroNutrientes(UsuarioModel usuario) {
@@ -126,12 +132,17 @@ public class UsuarioService {
 		if(usuario.isPresent() && refeicao.isPresent()) {
 			
 			usuario.get().getRefeicoes().add(refeicao.get());
+			atualizaCaloriasRestantesPorRefeicao(usuario.get(),refeicao.get());
 			usuarioRepository.save(usuario.get());
 			return ResponseEntity.ok(new UsuarioDto(usuario.get()));
 			
 		} else {
 			return ResponseEntity.notFound().build();
 		}
+	}
+
+	private void atualizaCaloriasRestantesPorRefeicao(UsuarioModel usuario, RefeicaoModel refeicao) {
+		usuario.getDistribruicaoMacros().adicionaCaloriaRestante(refeicao.getCaloriasTotais());
 	}
 
 	public ResponseEntity<UsuarioDto> cadastraMacros(Long idUsuario,Long idMacros) {
@@ -163,42 +174,37 @@ public class UsuarioService {
 		
 		if(usuario.isPresent() && exercicio.isPresent()) {
 			usuario.get().getExercicios().add(exercicio.get());
+			atualizaCaloriasRestantesPorExercicio(usuario.get(),exercicio.get());
 			usuarioRepository.save(usuario.get());
 			return ResponseEntity.ok(new UsuarioDto(usuario.get()));
 		} else {
 			return ResponseEntity.notFound().build();
 		}
 	}
-	
-	public static void calculaCaloriasDiarias(UsuarioModel usuario) {
+
+	private void atualizaCaloriasRestantesPorExercicio(UsuarioModel usuario, ExercicioModel exercicio) {
+		usuario.getDistribruicaoMacros().subtraiCaloriaRestante(exercicio.getCaloriasGastas());
+	}
+
+	public static void calculaCaloriasNecessarias(UsuarioModel usuario) {
 			
 			List<ExercicioModel> exercicios = usuario.getExercicios();
 			double metabolismoBasal = usuario.getTaxaMetabolismoBasal();
 			
-			usuario.getDistribruicaoMacros().adicionarCaloria(metabolismoBasal);
-			
-			exercicios.forEach(exercicio -> {
-				usuario.getDistribruicaoMacros().adicionarCaloria(exercicio.getCaloriasGastas());
-			});
+			usuario.getDistribruicaoMacros().adicionaCaloriaNecessaria(metabolismoBasal);
 			
 			if(usuario.getObjetivo() == ObjetivoEnumModel.GANHO_PESO) {
-				usuario.getDistribruicaoMacros().adicionarCaloria(500);
+				usuario.getDistribruicaoMacros().adicionaCaloriaNecessaria(500);
 			} else if (usuario.getObjetivo() == ObjetivoEnumModel.PERDA_PESO) {
-				usuario.getDistribruicaoMacros().adicionarCaloria(-500);
+				usuario.getDistribruicaoMacros().adicionaCaloriaNecessaria(-500);
+			}
+			
+			if(exercicios.isEmpty()) {
+				usuario.getDistribruicaoMacros().adicionaCaloriaNecessaria(0); //rever
+			} else {
+				exercicios.forEach(exercicio -> {
+					usuario.getDistribruicaoMacros().adicionaCaloriaNecessaria(exercicio.getCaloriasGastas());
+				});
 			}
 	}
-
-	public ResponseEntity<UsuarioDto> cadastraCaloriasDiarias(Long idUsuario) {
-		
-		Optional<UsuarioModel> usuario = usuarioRepository.findById(idUsuario);
-		
-		if(usuario.isPresent()) {
-			calculaCaloriasDiarias(usuario.get());
-			usuarioRepository.save(usuario.get());
-			return ResponseEntity.ok(new UsuarioDto(usuario.get()));
-		} else {
-			return ResponseEntity.notFound().build();
-		}
-
-}
 }

@@ -1,6 +1,7 @@
 package com.br.CalculadoraMacroNutrientes.services;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,6 +70,11 @@ public class ExercicioService {
 		} else {
 			return ResponseEntity.notFound().build();
 		}
+	}
+
+	public ResponseEntity<List<ExercicioDto>> listaExercicios() {
+		List<ExercicioModel> exercicios = exercicioRepository.findAll();
+		return ResponseEntity.ok(ExercicioDto.converter(exercicios));
 	}
 
 }

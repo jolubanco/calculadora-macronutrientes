@@ -15,8 +15,11 @@ public class UsuarioForm {
 	private String nome;
 	@NonNull
 	private String objetivo; //(ENUM) validar o envio
+	@NonNull
 	private double peso;
+	@NonNull
 	private double altura;
+	@NonNull
 	private int idade;
 	@NonNull
 	private String sexo; //(ENUM) validar o envio

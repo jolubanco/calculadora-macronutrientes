@@ -1,5 +1,7 @@
 package com.br.CalculadoraMacroNutrientes.controllers;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,10 +26,16 @@ public class RefeicaoController {
 	@Autowired
 	private RefeicaoService refeicaoService;
 	
+	@ApiOperation(value = "Lista todas as refeições cadastradas")
+	@GetMapping
+	public ResponseEntity<List<RefeicaoDto>> listaRefeicoes(){
+		return refeicaoService.listaRefeicoes();
+	}
+	
 	@ApiOperation(value = "Detalha a refeição cadastrada")
 	@GetMapping("/{idRefeicao}")
-	public RefeicaoDetalharDto detalhaRefeicao(@PathVariable Long idRefeicao) {
-		return null;
+	public ResponseEntity<RefeicaoDetalharDto> detalhaRefeicao(@PathVariable("idRefeicao") Long idRefeicao) {
+		return refeicaoService.detalhaRefeicao(idRefeicao);
 	}
 	
 	@ApiOperation(value = "Cadastra uma refeição")

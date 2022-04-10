@@ -1,6 +1,7 @@
 package com.br.CalculadoraMacroNutrientes.services;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.br.CalculadoraMacroNutrientes.controllers.dtos.RefeicaoDetalharDto;
 import com.br.CalculadoraMacroNutrientes.controllers.dtos.RefeicaoDto;
 import com.br.CalculadoraMacroNutrientes.controllers.forms.RefeicaoForm;
 import com.br.CalculadoraMacroNutrientes.models.AlimentoModel;
@@ -63,6 +65,20 @@ public class RefeicaoService {
 		
 		refeicaoRepository.save(refeicao);
 		
+	}
+
+	public ResponseEntity<List<RefeicaoDto>> listaRefeicoes() {
+		List<RefeicaoModel> refeicoes = refeicaoRepository.findAll();
+		return ResponseEntity.ok(RefeicaoDto.converter(refeicoes));
+	}
+
+	public ResponseEntity<RefeicaoDetalharDto> detalhaRefeicao(Long idRefeicao) {
+		Optional<RefeicaoModel> refeicao = refeicaoRepository.findById(idRefeicao);
+		if(refeicao.isPresent()) {
+			return ResponseEntity.ok(new RefeicaoDetalharDto(refeicao.get()));
+		} else {
+			return ResponseEntity.notFound().build();
+		}
 	}
 
 }
