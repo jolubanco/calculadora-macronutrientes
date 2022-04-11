@@ -18,7 +18,7 @@ import com.br.CalculadoraMacroNutrientes.models.DistribuicaoMacrosModel;
 import com.br.CalculadoraMacroNutrientes.models.ExercicioModel;
 import com.br.CalculadoraMacroNutrientes.models.ObjetivoEnumModel;
 import com.br.CalculadoraMacroNutrientes.models.RefeicaoModel;
-import com.br.CalculadoraMacroNutrientes.models.SexoEnumModel;
+import com.br.CalculadoraMacroNutrientes.models.SexoEnum;
 import com.br.CalculadoraMacroNutrientes.models.UsuarioModel;
 import com.br.CalculadoraMacroNutrientes.repositories.DistribuicaoMacrosRepository;
 import com.br.CalculadoraMacroNutrientes.repositories.ExercicioRepository;
@@ -59,12 +59,12 @@ public class UsuarioService {
 			double peso = usuario.getInformacoesUsuario().getPeso();
 			int idade = usuario.getInformacoesUsuario().getIdade();
 			
-			if (usuario.getInformacoesUsuario().getSexo().equals(SexoEnumModel.MASCULINO)) {
+			if (usuario.getInformacoesUsuario().getSexo().equals(SexoEnum.MASCULINO)) {
 				double tmbMasculino = 66 + ((13.7 * peso) + (5 * altura) - (6.8 * idade));			
-				usuario.setTaxaMetabolismoBasal(tmbMasculino);
-			} else if (usuario.getInformacoesUsuario().getSexo().equals(SexoEnumModel.FEMININO)) {
+				usuario.getInformacoesUsuario().setTaxaMetabolismoBasal(tmbMasculino);
+			} else if (usuario.getInformacoesUsuario().getSexo().equals(SexoEnum.FEMININO)) {
 				double tmbFeminino = 655 + ((9.6 * peso) + (1.8 * altura) - (4.7 * idade));			
-				usuario.setTaxaMetabolismoBasal(tmbFeminino);
+				usuario.getInformacoesUsuario().setTaxaMetabolismoBasal(tmbFeminino);
 			}
 		} catch(Exception e) {
 			e.getMessage();
@@ -83,6 +83,7 @@ public class UsuarioService {
 		UsuarioModel usuario = form.converter(informacoesUsuarioRepository);
         calculaDistribuicaoMacroNutrientes(usuario);
 		calculaTaxaMetabolismoBasal(usuario);
+		calculaNecessidadeDiariaDeCalorias(usuario);
 		calculaCaloriasNecessarias(usuario);
 		defineCaloriasRestantes(usuario);
 		usuarioRepository.save(usuario);
@@ -189,7 +190,7 @@ public class UsuarioService {
 	public static void calculaCaloriasNecessarias(UsuarioModel usuario) {
 			
 			List<ExercicioModel> exercicios = usuario.getExercicios();
-			double metabolismoBasal = usuario.getTaxaMetabolismoBasal();
+			double metabolismoBasal = usuario.getInformacoesUsuario().getTaxaMetabolismoBasal();
 			
 			usuario.getDistribruicaoMacros().adicionaCaloriaNecessaria(metabolismoBasal);
 			
@@ -206,5 +207,11 @@ public class UsuarioService {
 					usuario.getDistribruicaoMacros().adicionaCaloriaNecessaria(exercicio.getCaloriasGastas());
 				});
 			}
+	}
+	
+	public void calculaNecessidadeDiariaDeCalorias(UsuarioModel usuario) {
+		double basal = usuario.getInformacoesUsuario().getTaxaMetabolismoBasal();
+		double ndc = basal * usuario.getInformacoesUsuario().getFatorAtividadeFisica().getFator();
+		usuario.setNecessidadeDiariaCalorias(ndc);
 	}
 }

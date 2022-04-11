@@ -1,5 +1,7 @@
 package com.br.CalculadoraMacroNutrientes.controllers;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -41,7 +43,7 @@ public class UsuarioController {
 	
 	@ApiOperation(value = "Cadastra um usuário e calcula a taxa de matabolismo basal e a distribuição de macronutrientes de acordo com o objetivo")
 	@PostMapping
-	public ResponseEntity<UsuarioDto> cadastraUsuario(@RequestBody UsuarioForm form, UriComponentsBuilder uriBuilder) {
+	public ResponseEntity<UsuarioDto> cadastraUsuario(@RequestBody @Valid UsuarioForm form, UriComponentsBuilder uriBuilder) {
 		return usuarioService.cadastraUsuario(form, uriBuilder);
 	}
 	

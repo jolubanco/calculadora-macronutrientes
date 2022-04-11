@@ -28,7 +28,7 @@ public class UsuarioModel {
 	private String nome;
 	@Enumerated(EnumType.STRING)
 	private ObjetivoEnumModel objetivo;
-	private double taxaMetabolismoBasal;
+	private double necessidadeDiariaCalorias;
 	@OneToOne
 	private InformacoesUsuarioModel informacoesUsuario;
 	@OneToOne

@@ -26,9 +26,12 @@ public class InformacoesUsuarioModel {
 	private double altura;
 	private int idade;
 	@Enumerated(EnumType.STRING)
-	private SexoEnumModel sexo;
+	private SexoEnum sexo;
+	@Enumerated(EnumType.STRING)
+	private FatorAtividadeFisicaEnum fatorAtividadeFisica;
+	private double taxaMetabolismoBasal;
 	
-	public InformacoesUsuarioModel(double peso, double altura, int idade, SexoEnumModel sexo) {
+	public InformacoesUsuarioModel(double peso, double altura, int idade, SexoEnum sexo) {
 		this.peso = peso;
 		this.altura = altura;
 		this.idade = idade;

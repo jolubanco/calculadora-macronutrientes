@@ -14,7 +14,7 @@ public class UsuarioDetalharDto {
 	private Long id;
 	private String nome;
 	private String objetivo;
-	private double taxaMetabolismoBasal;
+	private double necessidadeDiariaCalorias;
 	private InformacoesUsuarioDto informacoesUsuario;
 	private DistribuicaoMacrosDto distribruicaoMacros;
 	private List<RefeicaoDto> refeicoes;
@@ -24,7 +24,7 @@ public class UsuarioDetalharDto {
 		this.id = usuario.getId();
 		this.nome = usuario.getNome();
 		this.objetivo = usuario.getObjetivo().name();
-		this.taxaMetabolismoBasal = usuario.getTaxaMetabolismoBasal();
+		this.necessidadeDiariaCalorias = usuario.getNecessidadeDiariaCalorias();
 		this.informacoesUsuario = usuario.getInformacoesUsuario().converterDto();
 		this.distribruicaoMacros = usuario.getDistribruicaoMacros().converterDto();
 		this.refeicoes = RefeicaoModel.converterDto(usuario.getRefeicoes()); //testar

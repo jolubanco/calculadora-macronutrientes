@@ -1,6 +1,6 @@
 package com.br.CalculadoraMacroNutrientes.models;
 
-public enum SexoEnumModel {
+public enum SexoEnum {
 	
 	FEMININO,MASCULINO
 

@@ -5,8 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.br.CalculadoraMacroNutrientes.models.InformacoesUsuarioModel;
-import com.br.CalculadoraMacroNutrientes.models.SexoEnumModel;
-import com.br.CalculadoraMacroNutrientes.models.TaxaAtividadeEnumModel;
+import com.br.CalculadoraMacroNutrientes.models.SexoEnum;
 import com.br.CalculadoraMacroNutrientes.models.UsuarioModel;
 
 public class UsuarioServiceTest {
@@ -25,14 +24,14 @@ public class UsuarioServiceTest {
 		info.setAltura(175);
 		info.setIdade(27);
 		info.setPeso(80);
-		info.setSexo(SexoEnumModel.MASCULINO);
+		info.setSexo(SexoEnum.MASCULINO);
 		
 		UsuarioModel usuario = new UsuarioModel();
 		usuario.setInformacoesUsuario(info);
 		
 		service.calculaTaxaMetabolismoBasal(usuario);
 		
-		Assertions.assertEquals(1853.40,usuario.getTaxaMetabolismoBasal());
+		Assertions.assertEquals(1853.40,usuario.getInformacoesUsuario().getTaxaMetabolismoBasal());
 
 	}
 
