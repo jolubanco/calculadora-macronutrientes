@@ -1,5 +1,8 @@
 package com.br.CalculadoraMacroNutrientes.models;
 
+import lombok.Getter;
+
+@Getter
 public enum FatorAtividadeFisicaEnum {
 	
 	SEDENTARIO(1.2),
@@ -12,10 +15,6 @@ public enum FatorAtividadeFisicaEnum {
 	
 	private FatorAtividadeFisicaEnum(double fator) {
 		this.fator = fator;
-	}
-	
-	public double getFator() {
-		return this.fator;
 	}
 
 }

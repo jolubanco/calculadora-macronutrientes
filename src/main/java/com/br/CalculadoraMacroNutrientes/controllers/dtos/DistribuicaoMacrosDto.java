@@ -10,26 +10,21 @@ public class DistribuicaoMacrosDto {
 	private double carboidrato;
 	private double proteina;
 	private double gordura;
-	private double caloriasNecessarias; 
-	private double caloriasRestantes;
+	private double consumoCaloriasDisponivel;
 	
 	//ver onde é utilizado
 	public DistribuicaoMacrosDto(DistribuicaoMacrosModel distruicaoMacros) {
 		this.carboidrato = distruicaoMacros.getCarboidrato();
 		this.proteina = distruicaoMacros.getProteina();
 		this.gordura = distruicaoMacros.getGordura();
-		this.caloriasNecessarias = distruicaoMacros.getCaloriasNecessarias();
-		this.caloriasRestantes = distruicaoMacros.getCaloriasRestantes();
+		this.consumoCaloriasDisponivel = distruicaoMacros.getConsumoCaloriasDisponivel();
 	}
 
-	public DistribuicaoMacrosDto(double carboidrato, double proteina, double gordura, double caloriasNecessarias, double caloriasRestantes) {
+	public DistribuicaoMacrosDto(double carboidrato, double proteina, double gordura, double consumoCaloriasDisponivel) {
 		this.carboidrato = carboidrato;
 		this.proteina = proteina;
 		this.gordura = gordura;
-		this.caloriasNecessarias = caloriasNecessarias;
-		this.caloriasRestantes = caloriasRestantes;
+		this.consumoCaloriasDisponivel = consumoCaloriasDisponivel;
 	}
 	
-	
-
 }

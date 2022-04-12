@@ -5,6 +5,7 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.Length;
 
+import com.br.CalculadoraMacroNutrientes.models.FatorAtividadeFisicaEnum;
 import com.br.CalculadoraMacroNutrientes.models.InformacoesUsuarioModel;
 import com.br.CalculadoraMacroNutrientes.models.ObjetivoEnumModel;
 import com.br.CalculadoraMacroNutrientes.models.SexoEnum;
@@ -19,18 +20,23 @@ public class UsuarioForm {
 	private String nome;
 	@NotNull @NotBlank
 	private String objetivo;
-	@NotNull @Length(min = 2,max = 4)
+	@NotNull
+	//@Length(min = 2,max = 4)
 	private double peso;
-	@NotNull @Length(min = 3,max = 6)
+	@NotNull 
+	//@Length(min = 3,max = 6)
 	private double altura;
-	@NotNull @Length(min = 2,max = 2)
+	@NotNull 
+	//@Length(min = 1,max = 2)
 	private int idade;
 	@NotNull @NotBlank
 	private String sexo;
+	@NotNull @NotBlank
+	private String fatorAtividadeFisica;
 
 	public UsuarioModel converter(InformacoesUsuarioRepository informacoesUsuarioRepository) {
 		
-		InformacoesUsuarioModel infoUsuario = new InformacoesUsuarioModel(peso,altura,idade,SexoEnum.valueOf(sexo));
+		InformacoesUsuarioModel infoUsuario = new InformacoesUsuarioModel(peso,altura,idade,SexoEnum.valueOf(sexo),FatorAtividadeFisicaEnum.valueOf(fatorAtividadeFisica));
 		informacoesUsuarioRepository.save(infoUsuario);
 		return new UsuarioModel(nome, ObjetivoEnumModel.valueOf(objetivo), infoUsuario);
 		

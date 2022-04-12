@@ -41,7 +41,7 @@ public class UsuarioController {
 		return usuarioService.detalhaUsuario(idUsuario);
 	}
 	
-	@ApiOperation(value = "Cadastra um usuário e calcula a taxa de matabolismo basal e a distribuição de macronutrientes de acordo com o objetivo")
+	@ApiOperation(value = "Cadastra um usuário e calcula a necessidade de calorias diárias e a distribuição de macronutrientes de acordo com o objetivo")
 	@PostMapping
 	public ResponseEntity<UsuarioDto> cadastraUsuario(@RequestBody @Valid UsuarioForm form, UriComponentsBuilder uriBuilder) {
 		return usuarioService.cadastraUsuario(form, uriBuilder);

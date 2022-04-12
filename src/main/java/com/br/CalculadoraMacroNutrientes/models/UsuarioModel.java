@@ -43,4 +43,8 @@ public class UsuarioModel {
 		this.objetivo = objetivo;
 		this.informacoesUsuario = informacoesUsuario;
 	}
+
+	public void adicionaCaloriaNdc(double caloria) {
+		this.necessidadeDiariaCalorias += caloria;
+	}
 }

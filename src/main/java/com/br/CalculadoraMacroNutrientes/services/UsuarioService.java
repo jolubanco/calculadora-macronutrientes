@@ -1,7 +1,6 @@
 package com.br.CalculadoraMacroNutrientes.services;
 
 import java.net.URI;
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,20 +71,19 @@ public class UsuarioService {
 	}
 
 	public Page<UsuarioDto> listaUsuarios(Pageable paginacao) {
-		
 		Page<UsuarioModel> usuarios = usuarioRepository.findAll(paginacao);
 		return UsuarioDto.converter(usuarios);
-		
 	}
 	
 	public ResponseEntity<UsuarioDto> cadastraUsuario(UsuarioForm form, UriComponentsBuilder uriBuilder) {
 		
 		UsuarioModel usuario = form.converter(informacoesUsuarioRepository);
+		
         calculaDistribuicaoMacroNutrientes(usuario);
 		calculaTaxaMetabolismoBasal(usuario);
 		calculaNecessidadeDiariaDeCalorias(usuario);
-		calculaCaloriasNecessarias(usuario);
 		defineCaloriasRestantes(usuario);
+		
 		usuarioRepository.save(usuario);
 		
         URI uri = uriBuilder.path("/usuarios/{id}").buildAndExpand(usuario.getId()).toUri();
@@ -94,7 +92,7 @@ public class UsuarioService {
 	}
 
 	private void defineCaloriasRestantes(UsuarioModel usuario) {
-		usuario.getDistribruicaoMacros().setCaloriasRestantes(usuario.getDistribruicaoMacros().getCaloriasNecessarias());;	
+		usuario.getDistribruicaoMacros().setConsumoCaloriasDisponivel(usuario.getNecessidadeDiariaCalorias());;	
 	}
 
 	private void calculaDistribuicaoMacroNutrientes(UsuarioModel usuario) {
@@ -143,7 +141,7 @@ public class UsuarioService {
 	}
 
 	private void atualizaCaloriasRestantesPorRefeicao(UsuarioModel usuario, RefeicaoModel refeicao) {
-		usuario.getDistribruicaoMacros().adicionaCaloriaRestante(refeicao.getCaloriasTotais());
+		usuario.getDistribruicaoMacros().subtraiCaloriaConsumo(refeicao.getCaloriasTotais());
 	}
 
 	public ResponseEntity<UsuarioDto> cadastraMacros(Long idUsuario,Long idMacros) {
@@ -184,34 +182,22 @@ public class UsuarioService {
 	}
 
 	private void atualizaCaloriasRestantesPorExercicio(UsuarioModel usuario, ExercicioModel exercicio) {
-		usuario.getDistribruicaoMacros().subtraiCaloriaRestante(exercicio.getCaloriasGastas());
-	}
-
-	public static void calculaCaloriasNecessarias(UsuarioModel usuario) {
-			
-			List<ExercicioModel> exercicios = usuario.getExercicios();
-			double metabolismoBasal = usuario.getInformacoesUsuario().getTaxaMetabolismoBasal();
-			
-			usuario.getDistribruicaoMacros().adicionaCaloriaNecessaria(metabolismoBasal);
-			
-			if(usuario.getObjetivo() == ObjetivoEnumModel.GANHO_PESO) {
-				usuario.getDistribruicaoMacros().adicionaCaloriaNecessaria(500);
-			} else if (usuario.getObjetivo() == ObjetivoEnumModel.PERDA_PESO) {
-				usuario.getDistribruicaoMacros().adicionaCaloriaNecessaria(-500);
-			}
-			
-			if(exercicios.isEmpty()) {
-				usuario.getDistribruicaoMacros().adicionaCaloriaNecessaria(0); //rever
-			} else {
-				exercicios.forEach(exercicio -> {
-					usuario.getDistribruicaoMacros().adicionaCaloriaNecessaria(exercicio.getCaloriasGastas());
-				});
-			}
+		usuario.getDistribruicaoMacros().adicionaCaloriaConsumo(exercicio.getCaloriasGastas());
 	}
 	
-	public void calculaNecessidadeDiariaDeCalorias(UsuarioModel usuario) {
+	private void calculaNecessidadeDiariaDeCalorias(UsuarioModel usuario) {
+		
 		double basal = usuario.getInformacoesUsuario().getTaxaMetabolismoBasal();
 		double ndc = basal * usuario.getInformacoesUsuario().getFatorAtividadeFisica().getFator();
+		
+		if(usuario.getObjetivo() == ObjetivoEnumModel.GANHO_PESO) {
+			usuario.adicionaCaloriaNdc(500);
+		} else if (usuario.getObjetivo() == ObjetivoEnumModel.PERDA_PESO) {
+			usuario.adicionaCaloriaNdc(-500);
+		} else if (usuario.getObjetivo() == ObjetivoEnumModel.MANTER_PESO) {
+			usuario.adicionaCaloriaNdc(0);
+		}
+		
 		usuario.setNecessidadeDiariaCalorias(ndc);
 	}
 }

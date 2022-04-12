@@ -23,8 +23,7 @@ public class DistribuicaoMacrosModel {
 	private double carboidrato = 0.0;
 	private double proteina = 0.0;
 	private double gordura = 0.0;
-	private double caloriasNecessarias = 0.0;
-	private double caloriasRestantes;
+	private double consumoCaloriasDisponivel;
 
 	public DistribuicaoMacrosModel(double carboidrato, double proteina, double gordura) {
 		this.carboidrato = carboidrato;
@@ -33,20 +32,15 @@ public class DistribuicaoMacrosModel {
 	}
 
 	public DistribuicaoMacrosDto converterDto() {
-		return new DistribuicaoMacrosDto(carboidrato,proteina,gordura,caloriasNecessarias,caloriasRestantes);
+		return new DistribuicaoMacrosDto(carboidrato,proteina,gordura,consumoCaloriasDisponivel);
 	}
 	
-	public void adicionaCaloriaNecessaria(double caloria) {
-		caloriasNecessarias += caloria;
+	public void adicionaCaloriaConsumo(double caloria) {
+		consumoCaloriasDisponivel += caloria;
 	}
 
-	public void subtraiCaloriaRestante(double calorias) {
-		caloriasRestantes -= calorias;
-		
-	}
-
-	public void adicionaCaloriaRestante(double calorias) {
-		caloriasRestantes += calorias;
+	public void subtraiCaloriaConsumo(double calorias) {
+		consumoCaloriasDisponivel -= calorias;
 		
 	}
 }

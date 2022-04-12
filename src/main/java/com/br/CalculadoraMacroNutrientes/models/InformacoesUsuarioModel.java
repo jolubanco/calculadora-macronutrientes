@@ -31,11 +31,12 @@ public class InformacoesUsuarioModel {
 	private FatorAtividadeFisicaEnum fatorAtividadeFisica;
 	private double taxaMetabolismoBasal;
 	
-	public InformacoesUsuarioModel(double peso, double altura, int idade, SexoEnum sexo) {
+	public InformacoesUsuarioModel(double peso, double altura, int idade, SexoEnum sexo, FatorAtividadeFisicaEnum fatorAtividadeFisica) {
 		this.peso = peso;
 		this.altura = altura;
 		this.idade = idade;
 		this.sexo = sexo;
+		this.fatorAtividadeFisica = fatorAtividadeFisica;
 	}
 
 	public InformacoesUsuarioDto converterDto() {
