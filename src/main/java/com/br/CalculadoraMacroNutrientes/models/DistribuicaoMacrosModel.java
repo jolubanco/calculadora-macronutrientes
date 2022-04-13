@@ -20,10 +20,13 @@ public class DistribuicaoMacrosModel {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	private double carboidrato = 0.0;
-	private double proteina = 0.0;
-	private double gordura = 0.0;
+	private double carboidrato;
+	private double proteina;
+	private double gordura;
 	private double consumoCaloriasDisponivel;
+	private double carboidratoDisponivel;
+	private double proteinaDisponivel;
+	private double gorduraDisponivel;
 
 	public DistribuicaoMacrosModel(double carboidrato, double proteina, double gordura) {
 		this.carboidrato = carboidrato;
@@ -32,7 +35,7 @@ public class DistribuicaoMacrosModel {
 	}
 
 	public DistribuicaoMacrosDto converterDto() {
-		return new DistribuicaoMacrosDto(carboidrato,proteina,gordura,consumoCaloriasDisponivel);
+		return new DistribuicaoMacrosDto(carboidratoDisponivel,proteinaDisponivel,gorduraDisponivel,consumoCaloriasDisponivel);
 	}
 	
 	public void adicionaCaloriaConsumo(double caloria) {
@@ -41,6 +44,17 @@ public class DistribuicaoMacrosModel {
 
 	public void subtraiCaloriaConsumo(double calorias) {
 		consumoCaloriasDisponivel -= calorias;
-		
+	}
+
+	public void subtraiCarboidrato(double carboidratos) {
+		this.carboidratoDisponivel -= carboidratos;
+	}
+
+	public void subtraiProteina(double proteinas) {
+		this.proteinaDisponivel -= proteinas;
+	}
+
+	public void subtraiGordura(double gorduras) {
+		this.gorduraDisponivel -= gorduras;
 	}
 }

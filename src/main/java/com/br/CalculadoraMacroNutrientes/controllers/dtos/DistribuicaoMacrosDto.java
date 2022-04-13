@@ -7,23 +7,22 @@ import lombok.Data;
 @Data
 public class DistribuicaoMacrosDto {
 	
-	private double carboidrato;
-	private double proteina;
-	private double gordura;
+	private double carboidratoDisponiveis;
+	private double proteinaDisponiveis;
+	private double gorduraDisponiveis;
 	private double consumoCaloriasDisponivel;
 	
-	//ver onde é utilizado
 	public DistribuicaoMacrosDto(DistribuicaoMacrosModel distruicaoMacros) {
-		this.carboidrato = distruicaoMacros.getCarboidrato();
-		this.proteina = distruicaoMacros.getProteina();
-		this.gordura = distruicaoMacros.getGordura();
+		this.carboidratoDisponiveis = distruicaoMacros.getCarboidratoDisponivel();
+		this.proteinaDisponiveis = distruicaoMacros.getProteinaDisponivel();
+		this.gorduraDisponiveis = distruicaoMacros.getGorduraDisponivel();
 		this.consumoCaloriasDisponivel = distruicaoMacros.getConsumoCaloriasDisponivel();
 	}
 
 	public DistribuicaoMacrosDto(double carboidrato, double proteina, double gordura, double consumoCaloriasDisponivel) {
-		this.carboidrato = carboidrato;
-		this.proteina = proteina;
-		this.gordura = gordura;
+		this.carboidratoDisponiveis = carboidrato;
+		this.proteinaDisponiveis = proteina;
+		this.gorduraDisponiveis = gordura;
 		this.consumoCaloriasDisponivel = consumoCaloriasDisponivel;
 	}
 	

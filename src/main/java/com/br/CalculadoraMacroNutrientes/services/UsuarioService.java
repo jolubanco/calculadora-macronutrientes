@@ -81,8 +81,9 @@ public class UsuarioService {
 		
         calculaDistribuicaoMacroNutrientes(usuario);
 		calculaTaxaMetabolismoBasal(usuario);
-		calculaNecessidadeDiariaDeCalorias(usuario);
+		calculaNecessidadeDiariaDeCalorias(usuario);//arredondar
 		defineCaloriasRestantes(usuario);
+		defineMacrosRestantes(usuario);
 		
 		usuarioRepository.save(usuario);
 		
@@ -91,8 +92,14 @@ public class UsuarioService {
 		return ResponseEntity.created(uri).body(new UsuarioDto(usuario));
 	}
 
+	private void defineMacrosRestantes(UsuarioModel usuario) {
+		usuario.getDistribruicaoMacros().setCarboidratoDisponivel(usuario.getDistribruicaoMacros().getCarboidrato());
+		usuario.getDistribruicaoMacros().setProteinaDisponivel(usuario.getDistribruicaoMacros().getProteina());
+		usuario.getDistribruicaoMacros().setGorduraDisponivel(usuario.getDistribruicaoMacros().getGordura());
+	}
+
 	private void defineCaloriasRestantes(UsuarioModel usuario) {
-		usuario.getDistribruicaoMacros().setConsumoCaloriasDisponivel(usuario.getNecessidadeDiariaCalorias());;	
+		usuario.getDistribruicaoMacros().setConsumoCaloriasDisponivel(usuario.getNecessidadeDiariaCalorias());	
 	}
 
 	private void calculaDistribuicaoMacroNutrientes(UsuarioModel usuario) {
@@ -132,12 +139,19 @@ public class UsuarioService {
 			
 			usuario.get().getRefeicoes().add(refeicao.get());
 			atualizaCaloriasRestantesPorRefeicao(usuario.get(),refeicao.get());
+			atualizaDistribuicaoDosMacros(usuario.get(),refeicao.get());
 			usuarioRepository.save(usuario.get());
 			return ResponseEntity.ok(new UsuarioDto(usuario.get()));
 			
 		} else {
 			return ResponseEntity.notFound().build();
 		}
+	}
+
+	private void atualizaDistribuicaoDosMacros(UsuarioModel usuario, RefeicaoModel refeicao) {
+		usuario.getDistribruicaoMacros().subtraiCarboidrato(refeicao.getCarboidratosTotais());
+		usuario.getDistribruicaoMacros().subtraiProteina(refeicao.getProteinasTotais());
+		usuario.getDistribruicaoMacros().subtraiGordura(refeicao.getGordurasTotais());
 	}
 
 	private void atualizaCaloriasRestantesPorRefeicao(UsuarioModel usuario, RefeicaoModel refeicao) {
@@ -198,6 +212,6 @@ public class UsuarioService {
 			usuario.adicionaCaloriaNdc(0);
 		}
 		
-		usuario.setNecessidadeDiariaCalorias(ndc);
+		usuario.setNecessidadeDiariaCalorias(Math.round(ndc*100.0)/100.0);
 	}
 }
