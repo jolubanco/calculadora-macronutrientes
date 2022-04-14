@@ -8,7 +8,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
 import com.br.CalculadoraMacroNutrientes.controllers.dtos.RefeicaoDto;
@@ -31,7 +33,10 @@ public class RefeicaoModel {
 	private double carboidratosTotais = 0;
 	private double gordurasTotais = 0;
 	private LocalDate dataCriacao = LocalDate.now();
-	@OneToMany
+	@ManyToMany
+	@JoinTable(name = "refeicoes_alimentos",
+    joinColumns = @JoinColumn(name = "refeicao_id"),
+    inverseJoinColumns = @JoinColumn(name = "alimento_id"))
 	private List<AlimentoModel> alimentos = new ArrayList<>();
 	
 	public RefeicaoModel(String nome) {
