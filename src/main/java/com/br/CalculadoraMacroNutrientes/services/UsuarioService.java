@@ -52,8 +52,7 @@ public class UsuarioService {
 	public UsuarioService() {}
 	
 	public void calculaTaxaMetabolismoBasal(UsuarioModel usuario) {
-		try {
-			
+	
 			double altura = usuario.getInformacoesUsuario().getAltura();
 			double peso = usuario.getInformacoesUsuario().getPeso();
 			int idade = usuario.getInformacoesUsuario().getIdade();
@@ -65,9 +64,7 @@ public class UsuarioService {
 				double tmbFeminino = 655 + ((9.6 * peso) + (1.8 * altura) - (4.7 * idade));			
 				usuario.getInformacoesUsuario().setTaxaMetabolismoBasal(tmbFeminino);
 			}
-		} catch(Exception e) {
-			e.getMessage();
-		}
+			//usuarioRepository.save(usuario);
 	}
 
 	public Page<UsuarioDto> listaUsuarios(Pageable paginacao) {
@@ -96,6 +93,7 @@ public class UsuarioService {
 		usuario.getDistribruicaoMacros().setCarboidratoDisponivel(usuario.getDistribruicaoMacros().getCarboidrato());
 		usuario.getDistribruicaoMacros().setProteinaDisponivel(usuario.getDistribruicaoMacros().getProteina());
 		usuario.getDistribruicaoMacros().setGorduraDisponivel(usuario.getDistribruicaoMacros().getGordura());
+		//usuarioRepository.save(usuario);
 	}
 
 	private void defineCaloriasRestantes(UsuarioModel usuario) {
@@ -113,7 +111,7 @@ public class UsuarioService {
 			DistribuicaoMacrosModel distribuicaoMacros = new DistribuicaoMacrosModel(carboidrato,proteina,gordura);
 			distribuicaoMacrosRepository.save(distribuicaoMacros);
 			usuario.setDistribruicaoMacros(distribuicaoMacros);
-			usuarioRepository.save(usuario);
+			//usuarioRepository.save(usuario);
 			
 		} else if(usuario.getObjetivo() == ObjetivoEnumModel.PERDA_PESO) {
 			
@@ -124,7 +122,7 @@ public class UsuarioService {
 			DistribuicaoMacrosModel distribuicaoMacros = new DistribuicaoMacrosModel(carboidrato,proteina,gordura);
 			distribuicaoMacrosRepository.save(distribuicaoMacros);
 			usuario.setDistribruicaoMacros(distribuicaoMacros);
-			usuarioRepository.save(usuario);
+			//usuarioRepository.save(usuario);
 			
 		}
 		
@@ -203,6 +201,7 @@ public class UsuarioService {
 		
 		double basal = usuario.getInformacoesUsuario().getTaxaMetabolismoBasal();
 		double ndc = basal * usuario.getInformacoesUsuario().getFatorAtividadeFisica().getFator();
+		usuario.setNecessidadeDiariaCalorias(ndc);
 		
 		if(usuario.getObjetivo() == ObjetivoEnumModel.GANHO_PESO) {
 			usuario.adicionaCaloriaNdc(500);
@@ -211,7 +210,5 @@ public class UsuarioService {
 		} else if (usuario.getObjetivo() == ObjetivoEnumModel.MANTER_PESO) {
 			usuario.adicionaCaloriaNdc(0);
 		}
-		
-		usuario.setNecessidadeDiariaCalorias(Math.round(ndc*100.0)/100.0);
 	}
 }
