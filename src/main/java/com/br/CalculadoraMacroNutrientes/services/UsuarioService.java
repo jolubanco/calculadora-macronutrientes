@@ -3,6 +3,7 @@ package com.br.CalculadoraMacroNutrientes.services;
 import java.net.URI;
 import java.util.Optional;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,6 +26,7 @@ import com.br.CalculadoraMacroNutrientes.repositories.InformacoesUsuarioReposito
 import com.br.CalculadoraMacroNutrientes.repositories.RefeicaoRepository;
 import com.br.CalculadoraMacroNutrientes.repositories.UsuarioRepository;
 
+@Slf4j
 @Service
 public class UsuarioService {
 	
@@ -73,13 +75,18 @@ public class UsuarioService {
 	}
 	
 	public ResponseEntity<UsuarioDto> cadastraUsuario(UsuarioForm form, UriComponentsBuilder uriBuilder) {
-		
+
 		UsuarioModel usuario = form.converter(informacoesUsuarioRepository);
-		
+
+		log.info("Calculando distribuição dos macros nutrientes");
         calculaDistribuicaoMacroNutrientes(usuario);
+		log.info("Calculando a taxa de metabolismo basal");
 		calculaTaxaMetabolismoBasal(usuario);
+		log.info("Calculando a necessidade de calorias diárias");
 		calculaNecessidadeDiariaDeCalorias(usuario);//arredondar
+		log.info("Definindo as calorias disponíveis");
 		defineCaloriasRestantes(usuario);
+		log.info("Definindo distribuição dos macros disponíveis");
 		defineMacrosRestantes(usuario);
 		
 		usuarioRepository.save(usuario);
@@ -189,6 +196,7 @@ public class UsuarioService {
 			usuarioRepository.save(usuario.get());
 			return ResponseEntity.ok(new UsuarioDto(usuario.get()));
 		} else {
+			log.info("Usuário ou refeição não encontrados");
 			return ResponseEntity.notFound().build();
 		}
 	}
