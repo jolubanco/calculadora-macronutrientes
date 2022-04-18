@@ -13,6 +13,14 @@ O usuáriio poderá cadastrar:
   - uma lista de alimentos
   - uma lista de exercícios
   - utilizar a sugestão de macronutrientes um definir a sua própria distribuição
+  
+## Fator de Atividade Física  
+
+  - Sedentários (pouco ou nenhum exercício) fator = 1.2
+  - Levemente ativo (exercício leve 1 a 3 dias por semana) fator = 1.375
+  - Moderadamente ativo (exercício moderado, faz esportes 3 a 5 dias por semana) fator = 1.55
+  - Altamente ativo (exercício pesado de 5 a 6 dias por semana) fator = 1.725
+  - Extremamente ativo (exercício pesado diariamente e até 2 vezes por dia) fator = 1.9
 
 ## Novas Funcionalidades
  - Refatorar a forma como é calculada a quantidade de calorias diárias necessárias para levar em consideração o fator de exercicio e ter um valor mais 
