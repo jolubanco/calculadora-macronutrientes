@@ -3,6 +3,8 @@ package com.br.CalculadoraMacroNutrientes.services;
 import java.net.URI;
 import java.util.Optional;
 
+import com.br.CalculadoraMacroNutrientes.exceptions.ExercicioNaoEncontradoException;
+import com.br.CalculadoraMacroNutrientes.exceptions.UsuarioNaoEncontradoException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -88,7 +90,7 @@ public class UsuarioService {
 		defineCaloriasRestantes(usuario);
 		log.info("Definindo distribuição dos macros disponíveis");
 		defineMacrosRestantes(usuario);
-		
+		log.info("Cadastrando usuário");
 		usuarioRepository.save(usuario);
 		
         URI uri = uriBuilder.path("/usuarios/{id}").buildAndExpand(usuario.getId()).toUri();
@@ -187,18 +189,15 @@ public class UsuarioService {
 
 	public ResponseEntity<UsuarioDto> cadastraExercicio(Long idUsuario, Long idExercicio) {
 		
-		Optional<UsuarioModel> usuario = usuarioRepository.findById(idUsuario);
-		Optional<ExercicioModel> exercicio = exercicioRepository.findById(idExercicio);
-		
-		if(usuario.isPresent() && exercicio.isPresent()) {
-			usuario.get().getExercicios().add(exercicio.get());
-			atualizaCaloriasRestantesPorExercicio(usuario.get(),exercicio.get());
-			usuarioRepository.save(usuario.get());
-			return ResponseEntity.ok(new UsuarioDto(usuario.get()));
-		} else {
-			log.info("Usuário ou refeição não encontrados");
-			return ResponseEntity.notFound().build();
-		}
+		UsuarioModel usuario = usuarioRepository.findById(idUsuario)
+				.orElseThrow(() -> new UsuarioNaoEncontradoException("Usuario de id " + idUsuario + " não encontrado"));
+		ExercicioModel exercicio = exercicioRepository.findById(idExercicio)
+				.orElseThrow(() -> new ExercicioNaoEncontradoException("Exercício de id " + idUsuario + " não encontrado"));
+
+		usuario.getExercicios().add(exercicio);
+		atualizaCaloriasRestantesPorExercicio(usuario,exercicio);
+		usuarioRepository.save(usuario);
+		return ResponseEntity.ok(new UsuarioDto(usuario));
 	}
 
 	private void atualizaCaloriasRestantesPorExercicio(UsuarioModel usuario, ExercicioModel exercicio) {
