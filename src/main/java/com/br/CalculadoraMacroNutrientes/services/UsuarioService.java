@@ -3,7 +3,9 @@ package com.br.CalculadoraMacroNutrientes.services;
 import java.net.URI;
 import java.util.Optional;
 
+import com.br.CalculadoraMacroNutrientes.exceptions.DistribuicaoMacrosNaoEncontradoException;
 import com.br.CalculadoraMacroNutrientes.exceptions.ExercicioNaoEncontradoException;
+import com.br.CalculadoraMacroNutrientes.exceptions.RefeicaoNaoEncontradoException;
 import com.br.CalculadoraMacroNutrientes.exceptions.UsuarioNaoEncontradoException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,7 +70,6 @@ public class UsuarioService {
 				double tmbFeminino = 655 + ((9.6 * peso) + (1.8 * altura) - (4.7 * idade));			
 				usuario.getInformacoesUsuario().setTaxaMetabolismoBasal(tmbFeminino);
 			}
-			//usuarioRepository.save(usuario);
 	}
 
 	public Page<UsuarioDto> listaUsuarios(Pageable paginacao) {
@@ -102,7 +103,6 @@ public class UsuarioService {
 		usuario.getDistribruicaoMacros().setCarboidratoDisponivel(usuario.getDistribruicaoMacros().getCarboidrato());
 		usuario.getDistribruicaoMacros().setProteinaDisponivel(usuario.getDistribruicaoMacros().getProteina());
 		usuario.getDistribruicaoMacros().setGorduraDisponivel(usuario.getDistribruicaoMacros().getGordura());
-		//usuarioRepository.save(usuario);
 	}
 
 	private void defineCaloriasRestantes(UsuarioModel usuario) {
@@ -120,9 +120,8 @@ public class UsuarioService {
 			DistribuicaoMacrosModel distribuicaoMacros = new DistribuicaoMacrosModel(carboidrato,proteina,gordura);
 			distribuicaoMacrosRepository.save(distribuicaoMacros);
 			usuario.setDistribruicaoMacros(distribuicaoMacros);
-			//usuarioRepository.save(usuario);
 			
-		} else if(usuario.getObjetivo() == ObjetivoEnumModel.PERDA_PESO) {
+		} else if (usuario.getObjetivo() == ObjetivoEnumModel.PERDA_PESO) {
 			
 			double carboidrato = 3 * usuario.getInformacoesUsuario().getPeso();
 			double proteina = 2 * usuario.getInformacoesUsuario().getPeso();
@@ -131,28 +130,22 @@ public class UsuarioService {
 			DistribuicaoMacrosModel distribuicaoMacros = new DistribuicaoMacrosModel(carboidrato,proteina,gordura);
 			distribuicaoMacrosRepository.save(distribuicaoMacros);
 			usuario.setDistribruicaoMacros(distribuicaoMacros);
-			//usuarioRepository.save(usuario);
-			
 		}
 		
 	}
 
 	public ResponseEntity<UsuarioDto> cadastraRefeicaoParaUsuario(Long idUsuario, Long idRefeicao) {
 		
-		Optional<UsuarioModel> usuario = usuarioRepository.findById(idUsuario);
-		Optional<RefeicaoModel> refeicao = refeicaoRepository.findById(idRefeicao);
-		
-		if(usuario.isPresent() && refeicao.isPresent()) {
+		UsuarioModel usuario = usuarioRepository.findById(idUsuario)
+				.orElseThrow(() -> new UsuarioNaoEncontradoException("Usuario de id " + idUsuario + " não encontrado"));
+		RefeicaoModel refeicao = refeicaoRepository.findById(idRefeicao)
+				.orElseThrow(() -> new RefeicaoNaoEncontradoException("Refeicao de id " + idRefeicao + " não encontrada"));
 			
-			usuario.get().getRefeicoes().add(refeicao.get());
-			atualizaCaloriasRestantesPorRefeicao(usuario.get(),refeicao.get());
-			atualizaDistribuicaoDosMacros(usuario.get(),refeicao.get());
-			usuarioRepository.save(usuario.get());
-			return ResponseEntity.ok(new UsuarioDto(usuario.get()));
-			
-		} else {
-			return ResponseEntity.notFound().build();
-		}
+		usuario.getRefeicoes().add(refeicao);
+		atualizaCaloriasRestantesPorRefeicao(usuario,refeicao);
+		atualizaDistribuicaoDosMacros(usuario,refeicao);
+		usuarioRepository.save(usuario);
+		return ResponseEntity.ok(new UsuarioDto(usuario));
 	}
 
 	private void atualizaDistribuicaoDosMacros(UsuarioModel usuario, RefeicaoModel refeicao) {
@@ -166,25 +159,20 @@ public class UsuarioService {
 	}
 
 	public ResponseEntity<UsuarioDto> cadastraMacros(Long idUsuario,Long idMacros) {
-		Optional<UsuarioModel> usuario = usuarioRepository.findById(idUsuario);
-		Optional<DistribuicaoMacrosModel> distribuicaoMacros = distribuicaoMacrosRepository.findById(idMacros);
-		
-		if(usuario.isPresent() && distribuicaoMacros.isPresent()) {
-			usuario.get().setDistribruicaoMacros(distribuicaoMacros.get());
-			usuarioRepository.save(usuario.get());
-			return ResponseEntity.ok(new UsuarioDto(usuario.get()));
-		} else {
-			return ResponseEntity.notFound().build();
-		}
+		UsuarioModel usuario = usuarioRepository.findById(idUsuario)
+				.orElseThrow(() -> new UsuarioNaoEncontradoException("Usuario de id " + idUsuario + " não encontrado"));
+		DistribuicaoMacrosModel distribuicaoMacros = distribuicaoMacrosRepository.findById(idMacros)
+				.orElseThrow(() -> new DistribuicaoMacrosNaoEncontradoException("Distribuição de macros, de id " + idMacros + " não encontrada"));
+
+		usuario.setDistribruicaoMacros(distribuicaoMacros);
+		usuarioRepository.save(usuario);
+		return ResponseEntity.ok(new UsuarioDto(usuario));
 	}
 
 	public ResponseEntity<UsuarioDetalharDto> detalhaUsuario(Long idUsuario) {
-		Optional<UsuarioModel> usuario = usuarioRepository.findById(idUsuario);
-		if(usuario.isPresent()) {
-			return ResponseEntity.ok(new UsuarioDetalharDto(usuario.get()));
-		} else {
-			return ResponseEntity.notFound().build();
-		}
+		UsuarioModel usuario = usuarioRepository.findById(idUsuario)
+				.orElseThrow(() -> new UsuarioNaoEncontradoException("Usuario de id " + idUsuario + " não encontrado"));
+		return ResponseEntity.ok(new UsuarioDetalharDto(usuario));
 	}
 
 	public ResponseEntity<UsuarioDto> cadastraExercicio(Long idUsuario, Long idExercicio) {
@@ -192,7 +180,7 @@ public class UsuarioService {
 		UsuarioModel usuario = usuarioRepository.findById(idUsuario)
 				.orElseThrow(() -> new UsuarioNaoEncontradoException("Usuario de id " + idUsuario + " não encontrado"));
 		ExercicioModel exercicio = exercicioRepository.findById(idExercicio)
-				.orElseThrow(() -> new ExercicioNaoEncontradoException("Exercício de id " + idUsuario + " não encontrado"));
+				.orElseThrow(() -> new ExercicioNaoEncontradoException("Exercício de id " + idExercicio + " não encontrado"));
 
 		usuario.getExercicios().add(exercicio);
 		atualizaCaloriasRestantesPorExercicio(usuario,exercicio);

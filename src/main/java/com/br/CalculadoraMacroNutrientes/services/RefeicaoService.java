@@ -4,6 +4,10 @@ import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
+import com.br.CalculadoraMacroNutrientes.exceptions.AlimentoNaoEncontradoException;
+import com.br.CalculadoraMacroNutrientes.exceptions.RefeicaoNaoEncontradoException;
+import com.br.CalculadoraMacroNutrientes.exceptions.UsuarioNaoEncontradoException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -17,6 +21,7 @@ import com.br.CalculadoraMacroNutrientes.models.RefeicaoModel;
 import com.br.CalculadoraMacroNutrientes.repositories.AlimentoRepository;
 import com.br.CalculadoraMacroNutrientes.repositories.RefeicaoRepository;
 
+@Slf4j
 @Service
 public class RefeicaoService {
 	
@@ -39,21 +44,14 @@ public class RefeicaoService {
 
 	public ResponseEntity<RefeicaoDto> adicionaAlimentoNaRefeicao(Long idRefeicao, Long idAlimento) {
 		
-		Optional<RefeicaoModel> refeicao = refeicaoRepository.findById(idRefeicao);
-		Optional<AlimentoModel> alimento = alimentoRepository.findById(idAlimento);
-		
-		if(refeicao.isPresent() && alimento.isPresent()) {
+		RefeicaoModel refeicao = refeicaoRepository.findById(idRefeicao)
+				.orElseThrow(() -> new RefeicaoNaoEncontradoException("Refeicao de id " + idRefeicao + " não encontrada"));
+		AlimentoModel alimento = alimentoRepository.findById(idAlimento)
+				.orElseThrow(() -> new AlimentoNaoEncontradoException("Alimento de id " + idAlimento + " não encontrado"));
 			
-			refeicao.get().getAlimentos().add(alimento.get());
-			
-			atualizaMacroDaRefeicao(refeicao.get(),alimento.get());
-			
-			return ResponseEntity.ok(new RefeicaoDto(refeicao.get()));
-			
-		} else {
-			return ResponseEntity.notFound().build();
-		}
-		
+		refeicao.getAlimentos().add(alimento);
+		atualizaMacroDaRefeicao(refeicao,alimento);
+		return ResponseEntity.ok(new RefeicaoDto(refeicao));
 	}
 
 	private void atualizaMacroDaRefeicao(RefeicaoModel refeicao, AlimentoModel alimento) {
@@ -73,12 +71,45 @@ public class RefeicaoService {
 	}
 
 	public ResponseEntity<RefeicaoDetalharDto> detalhaRefeicao(Long idRefeicao) {
-		Optional<RefeicaoModel> refeicao = refeicaoRepository.findById(idRefeicao);
-		if(refeicao.isPresent()) {
-			return ResponseEntity.ok(new RefeicaoDetalharDto(refeicao.get()));
-		} else {
-			return ResponseEntity.notFound().build();
-		}
+		RefeicaoModel refeicao = refeicaoRepository.findById(idRefeicao)
+				.orElseThrow(() -> new RefeicaoNaoEncontradoException("Refeicao de id " + idRefeicao + " não encontrada"));
+
+		return ResponseEntity.ok(new RefeicaoDetalharDto(refeicao));
 	}
 
+	public ResponseEntity<?> removeAlimento(Long idRefeicao, Long idAlimento) {
+
+		RefeicaoModel refeicao = refeicaoRepository.findById(idRefeicao)
+				.orElseThrow(() -> new RefeicaoNaoEncontradoException("Refeicao de id " + idRefeicao + " não encontrada"));
+
+			List<AlimentoModel> alimentos = refeicao.getAlimentos();
+			try{
+				alimentos.removeIf(alimento -> alimento.getId().equals(idAlimento));
+				refeicaoRepository.save(refeicao);
+				return ResponseEntity.noContent().build();
+			} catch (Exception e) {
+				e.getMessage();
+				System.out.println("Alimento não encontrado na refeição"); //trocar por log
+				return ResponseEntity.notFound().build();
+			}
+	}
+
+    public ResponseEntity<?> atualizaRefeicao(Long idRefeicao, RefeicaoForm form) {
+		RefeicaoModel refeicao = refeicaoRepository.findById(idRefeicao)
+				.orElseThrow(() -> new RefeicaoNaoEncontradoException("Refeicao de id " + idRefeicao + " não encontrada"));
+
+		refeicao.setNome(form.getNome());
+		log.info("Atualizando a refeição de id {}",idRefeicao);
+		refeicaoRepository.save(refeicao);
+		return ResponseEntity.noContent().build();
+	}
+
+	public ResponseEntity<?> deletaRefeicao(Long idRefeicao) {
+		RefeicaoModel refeicao = refeicaoRepository.findById(idRefeicao)
+				.orElseThrow(() -> new RefeicaoNaoEncontradoException("Refeicao de id " + idRefeicao + " não encontrada"));
+
+		log.info("Deletando a refeição de id {}", idRefeicao);
+		refeicaoRepository.delete(refeicao);
+		return ResponseEntity.ok().build();
+	}
 }

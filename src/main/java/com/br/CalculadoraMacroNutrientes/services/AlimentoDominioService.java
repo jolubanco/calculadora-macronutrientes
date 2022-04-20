@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
+import com.br.CalculadoraMacroNutrientes.exceptions.AlimentoNaoEncontradoException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -35,12 +36,9 @@ public class AlimentoDominioService {
 	}
 
 	public ResponseEntity<AlimentoDominioDetalharDto> detalhaAlimentoDominio(Long idAlimentoDominio) {
-		Optional<AlimentoDominio> alimentoDominio = alimentoDominioRepository.findById(idAlimentoDominio);
-		if(alimentoDominio.isPresent()) {
-			return ResponseEntity.ok(new AlimentoDominioDetalharDto(alimentoDominio.get()));
-		} else {
-			return ResponseEntity.notFound().build();
-		}
+		AlimentoDominio alimentoDominio = alimentoDominioRepository.findById(idAlimentoDominio)
+				.orElseThrow(() -> new AlimentoNaoEncontradoException("Alimento de id " + idAlimentoDominio + " não encontrado"));
+		return ResponseEntity.ok(new AlimentoDominioDetalharDto(alimentoDominio));
 	}
 
 	public ResponseEntity<List<AlimentoDominioDto>> listaAlimentos() {

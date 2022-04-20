@@ -4,6 +4,8 @@ import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
+import com.br.CalculadoraMacroNutrientes.exceptions.ExercicioNaoEncontradoException;
+import com.br.CalculadoraMacroNutrientes.exceptions.RefeicaoNaoEncontradoException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -31,18 +33,12 @@ public class ExercicioService {
 	
 	public ExercicioModel calcularCaloriasExercicio(Long idExercicio, double tempoExecucao) {
 		
-		Optional<ExercicioDominio> exercicioReferencia = exercicioDominioRepository.findById(idExercicio);
-		
-		if (exercicioReferencia.isPresent()) {
-			String modalidade = exercicioReferencia.get().getModalidade();
-			double caloriasGastas = (exercicioReferencia.get().getCaloriasGastas()*tempoExecucao)/(exercicioReferencia.get().getTempo());
-			
-			return new ExercicioModel(modalidade, tempoExecucao, caloriasGastas);
-			
-		} else {
-			System.out.println("Exercicio não encontrado");
-			return null;
-		}
+		ExercicioDominio exercicioReferencia = exercicioDominioRepository.findById(idExercicio)
+				.orElseThrow(() -> new ExercicioNaoEncontradoException("Exercício de id " + idExercicio + " não encontrado"));
+
+		String modalidade = exercicioReferencia.getModalidade();
+		double caloriasGastas = (exercicioReferencia.getCaloriasGastas()*tempoExecucao)/(exercicioReferencia.getTempo());
+		return new ExercicioModel(modalidade, tempoExecucao, caloriasGastas);
 	}
 
 	public ResponseEntity<ExercicioDto> cadastraExercicio(ExercicioForm form, UriComponentsBuilder uriBuilder) {
@@ -63,13 +59,9 @@ public class ExercicioService {
 	}
 
 	public ResponseEntity<ExercicioDetalharDto> detalhaExercicio(Long idExercicio) {
-		
-		Optional<ExercicioModel> exercicio = exercicioRepository.findById(idExercicio);
-		if(exercicio.isPresent()) {
-			return ResponseEntity.ok(new ExercicioDetalharDto(exercicio.get()));
-		} else {
-			return ResponseEntity.notFound().build();
-		}
+		ExercicioModel exercicio = exercicioRepository.findById(idExercicio)
+				.orElseThrow(() -> new ExercicioNaoEncontradoException("Exercício de id " + idExercicio + " não encontrado"));
+		return ResponseEntity.ok(new ExercicioDetalharDto(exercicio));
 	}
 
 	public ResponseEntity<List<ExercicioDto>> listaExercicios() {

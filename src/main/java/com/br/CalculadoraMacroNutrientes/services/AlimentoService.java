@@ -4,6 +4,8 @@ import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
+import com.br.CalculadoraMacroNutrientes.exceptions.AlimentoNaoEncontradoException;
+import com.br.CalculadoraMacroNutrientes.exceptions.ExercicioNaoEncontradoException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -31,23 +33,17 @@ public class AlimentoService {
 	
 	public AlimentoModel calcularMacrosDoAlimento(Long idAlimento, double quantidadeInformada) {
 		
-		Optional<AlimentoDominio> alimentoReferencia = alimentoDominioRepository.findById(idAlimento);
-		
-		if(alimentoReferencia.isPresent()) {
+		AlimentoDominio alimentoReferencia = alimentoDominioRepository.findById(idAlimento)
+				.orElseThrow(() -> new AlimentoNaoEncontradoException("Alimento de id " + idAlimento + " não encontrado"));
 			
-			String nome = alimentoReferencia.get().getNome();
-			//necessario tratamento para não dividir por 0
-			double carboidrato = (alimentoReferencia.get().getCarboidrato()*quantidadeInformada)/(alimentoReferencia.get().getQuantidade());
-			double proteina = (alimentoReferencia.get().getProteina()*quantidadeInformada)/(alimentoReferencia.get().getQuantidade());
-			double gordura = (alimentoReferencia.get().getGordura()*quantidadeInformada)/(alimentoReferencia.get().getQuantidade());
-			double calorias = (alimentoReferencia.get().getCalorias()*quantidadeInformada)/(alimentoReferencia.get().getQuantidade());
-			
-			return new AlimentoModel(nome,quantidadeInformada,carboidrato,proteina,gordura,calorias);
-	
-		} else {
-			return null;
-		}
-	
+		String nome = alimentoReferencia.getNome();
+		//necessario tratamento para não dividir por 0
+		double carboidrato = (alimentoReferencia.getCarboidrato()*quantidadeInformada)/(alimentoReferencia.getQuantidade());
+		double proteina = (alimentoReferencia.getProteina()*quantidadeInformada)/(alimentoReferencia.getQuantidade());
+		double gordura = (alimentoReferencia.getGordura()*quantidadeInformada)/(alimentoReferencia.getQuantidade());
+		double calorias = (alimentoReferencia.getCalorias()*quantidadeInformada)/(alimentoReferencia.getQuantidade());
+
+		return new AlimentoModel(nome,quantidadeInformada,carboidrato,proteina,gordura,calorias);
 	}
 	
 	
@@ -61,12 +57,9 @@ public class AlimentoService {
 	}
 
 	public ResponseEntity<AlimentoDetalharDto> detalhaAlimento(Long idAlimento) {	
-		Optional<AlimentoModel> alimento = alimentoRepository.findById(idAlimento);
-		if(alimento.isPresent()) {
-			return ResponseEntity.ok(new AlimentoDetalharDto(alimento.get()));
-		} else {
-			return ResponseEntity.notFound().build();	
-		}
+		AlimentoModel alimento = alimentoRepository.findById(idAlimento)
+				.orElseThrow(() -> new AlimentoNaoEncontradoException("Alimento de id " + idAlimento + " não encontrado"));
+		return ResponseEntity.ok(new AlimentoDetalharDto(alimento));
 	}
 
 	public ResponseEntity<List<AlimentoDto>> listaAlimentos() {

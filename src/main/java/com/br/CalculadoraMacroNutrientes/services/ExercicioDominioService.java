@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
+import com.br.CalculadoraMacroNutrientes.exceptions.ExercicioNaoEncontradoException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -31,12 +32,9 @@ public class ExercicioDominioService {
 	}
 
 	public ResponseEntity<ExercicioDominioDetalharDto> detalhaExercicioDominio(Long idExercicioDominio) {
-		Optional<ExercicioDominio> exercicio = exercicioDominioRepository.findById(idExercicioDominio);
-		if(exercicio.isPresent()) {
-			return ResponseEntity.ok(new ExercicioDominioDetalharDto(exercicio.get()));
-		} else {
-			return ResponseEntity.notFound().build();
-		}
+		ExercicioDominio exercicio = exercicioDominioRepository.findById(idExercicioDominio)
+				.orElseThrow(() -> new ExercicioNaoEncontradoException("Exercício de id " + idExercicioDominio + " não encontrado"));
+			return ResponseEntity.ok(new ExercicioDominioDetalharDto(exercicio));
 	}
 
 	public ResponseEntity<List<ExercicioDominioDto>> listaExerciciosDominio() {
