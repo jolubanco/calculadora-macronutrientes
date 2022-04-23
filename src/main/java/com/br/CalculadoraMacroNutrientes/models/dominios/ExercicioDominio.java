@@ -27,4 +27,11 @@ public class ExercicioDominio {
 		this.tempo = tempo;
 		this.caloriasGastas = caloriasGastas;
 	}
+
+    public ExercicioDominio(Long id, String modalidade, double tempo, double caloriasGastas) {
+		this.id = id;
+		this.modalidade = modalidade;
+		this.tempo = tempo;
+		this.caloriasGastas = caloriasGastas;
+    }
 }

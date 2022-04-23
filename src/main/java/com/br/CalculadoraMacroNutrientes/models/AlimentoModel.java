@@ -39,4 +39,13 @@ public class AlimentoModel {
 		this.quantidade = quantidade;
 	}
 
+    public AlimentoModel(Long id, String nome, double quantidade, double carboidrato, double proteina, double gordura, double calorias) {
+		this.id = id;
+		this.nome = nome;
+		this.quantidade = quantidade;
+		this.carboidrato = carboidrato;
+		this.proteina = proteina;
+		this.gordura = gordura;
+		this.calorias = calorias;
+    }
 }

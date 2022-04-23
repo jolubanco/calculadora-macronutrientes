@@ -2,14 +2,10 @@ package com.br.CalculadoraMacroNutrientes.controllers;
 
 import java.util.List;
 
+import com.br.CalculadoraMacroNutrientes.controllers.forms.AlimentoUpdateForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.br.CalculadoraMacroNutrientes.controllers.dtos.AlimentoDetalharDto;
@@ -18,6 +14,8 @@ import com.br.CalculadoraMacroNutrientes.controllers.forms.AlimentoForm;
 import com.br.CalculadoraMacroNutrientes.services.AlimentoService;
 
 import io.swagger.annotations.ApiOperation;
+
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/alimentos")
@@ -34,7 +32,7 @@ public class AlimentoController {
 	
 	@ApiOperation(value = "Detalha um alimento cadastrado")
 	@GetMapping("/{idAlimento}")
-	public ResponseEntity<AlimentoDetalharDto> detalhaAlimento(@PathVariable Long idAlimento) {
+	public ResponseEntity<?> detalhaAlimento(@PathVariable Long idAlimento) {
 		return alimentoService.detalhaAlimento(idAlimento);
 	}
 	
@@ -44,4 +42,15 @@ public class AlimentoController {
 		return alimentoService.cadastraAlimento(form, uriBuilder);
 	}
 
+	@ApiOperation(value = "Atualiza um alimento")
+	@PutMapping("/update")
+	public ResponseEntity<?> atualizaAlimento(@RequestBody @Valid AlimentoUpdateForm form){
+		return alimentoService.atualizaAlimento(form);
+	}
+
+	@ApiOperation(value = "Deleta um alimento")
+	@DeleteMapping("/delete/{idAlimento}")
+	public ResponseEntity<?> deletaAlimento(@PathVariable("idAlimento") Long idAlimento){
+		return alimentoService.deletaAlimento(idAlimento);
+	}
 }

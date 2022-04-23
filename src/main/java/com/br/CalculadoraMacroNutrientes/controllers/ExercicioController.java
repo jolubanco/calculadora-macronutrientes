@@ -2,14 +2,10 @@ package com.br.CalculadoraMacroNutrientes.controllers;
 
 import java.util.List;
 
+import com.br.CalculadoraMacroNutrientes.controllers.forms.ExercicioUpdateForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.br.CalculadoraMacroNutrientes.controllers.dtos.ExercicioDetalharDto;
@@ -18,6 +14,8 @@ import com.br.CalculadoraMacroNutrientes.controllers.forms.ExercicioForm;
 import com.br.CalculadoraMacroNutrientes.services.ExercicioService;
 
 import io.swagger.annotations.ApiOperation;
+
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/exercicios")
@@ -34,14 +32,24 @@ public class ExercicioController {
 	
 	@ApiOperation(value = "Detalha exercício cadastrado")
 	@GetMapping("/{idExercicio}")
-	public ResponseEntity<ExercicioDetalharDto> detalhaExercicio(@PathVariable("idExercicio") Long idExercicio) {
+	public ResponseEntity<?> detalhaExercicio(@PathVariable("idExercicio") Long idExercicio) {
 		return exercicioService.detalhaExercicio(idExercicio);
 	}
 	
 	@ApiOperation(value = "Cadastra exercício a partir de um exercício de domínio")
 	@PostMapping
-	public ResponseEntity<ExercicioDto> cadastraExercicio(@RequestBody ExercicioForm form, UriComponentsBuilder uriBuilder){
+	public ResponseEntity<?> cadastraExercicio(@RequestBody @Valid ExercicioForm form, UriComponentsBuilder uriBuilder){
 		return exercicioService.cadastraExercicio(form,uriBuilder);
+	}
+	@ApiOperation(value = "Atualiza um exercício existente")
+	@PutMapping("/update")
+	public ResponseEntity<?> atualizaExercicio(@RequestBody @Valid ExercicioUpdateForm form, UriComponentsBuilder uri){
+		return exercicioService.atualizarExercicio(form,uri);
+	}
+	@ApiOperation(value = "Deleta um exercício")
+	@DeleteMapping("/delete/{idExercicio}")
+	public ResponseEntity<?> deletaExercicio(@PathVariable("idExercicio") Long idExercicio){
+		return exercicioService.deletaExercicio(idExercicio);
 	}
 
 }

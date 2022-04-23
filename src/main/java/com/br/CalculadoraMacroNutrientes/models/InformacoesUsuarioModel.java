@@ -39,8 +39,17 @@ public class InformacoesUsuarioModel {
 		this.fatorAtividadeFisica = fatorAtividadeFisica;
 	}
 
+	public InformacoesUsuarioModel(double peso, double altura, int idade, SexoEnum sexo, FatorAtividadeFisicaEnum fatorAtividadeFisica,double taxaMetabolismoBasal) {
+		this.peso = peso;
+		this.altura = altura;
+		this.idade = idade;
+		this.sexo = sexo;
+		this.fatorAtividadeFisica = fatorAtividadeFisica;
+		this.taxaMetabolismoBasal = taxaMetabolismoBasal;
+	}
+
 	public InformacoesUsuarioDto converterDto() {
-		return new InformacoesUsuarioDto(peso,altura,idade,sexo.name());
+		return new InformacoesUsuarioDto(peso,altura,idade,sexo.name(),fatorAtividadeFisica.name(),taxaMetabolismoBasal);
 	}
 
 }

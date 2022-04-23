@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
+import com.br.CalculadoraMacroNutrientes.controllers.forms.RefeicaoUpdateForm;
 import com.br.CalculadoraMacroNutrientes.exceptions.AlimentoNaoEncontradoException;
 import com.br.CalculadoraMacroNutrientes.exceptions.RefeicaoNaoEncontradoException;
 import com.br.CalculadoraMacroNutrientes.exceptions.UsuarioNaoEncontradoException;
@@ -36,33 +37,37 @@ public class RefeicaoService {
 
 	public ResponseEntity<RefeicaoDto> cadastraRefeicao(RefeicaoForm form, UriComponentsBuilder uriBuilder) {
 		RefeicaoModel refeicao = form.converter();
+		log.info("Cadastrando nova refeição");
 		refeicaoRepository.save(refeicao);
 		
         URI uri = uriBuilder.path("/refeicoes/{id}").buildAndExpand(refeicao.getId()).toUri();
 		return ResponseEntity.created(uri).body(new RefeicaoDto(refeicao));
 	}
 
-	public ResponseEntity<RefeicaoDto> adicionaAlimentoNaRefeicao(Long idRefeicao, Long idAlimento) {
-		
-		RefeicaoModel refeicao = refeicaoRepository.findById(idRefeicao)
-				.orElseThrow(() -> new RefeicaoNaoEncontradoException("Refeicao de id " + idRefeicao + " não encontrada"));
-		AlimentoModel alimento = alimentoRepository.findById(idAlimento)
-				.orElseThrow(() -> new AlimentoNaoEncontradoException("Alimento de id " + idAlimento + " não encontrado"));
-			
-		refeicao.getAlimentos().add(alimento);
-		atualizaMacroDaRefeicao(refeicao,alimento);
-		return ResponseEntity.ok(new RefeicaoDto(refeicao));
+	public ResponseEntity<?> adicionaAlimentoNaRefeicao(Long idRefeicao, Long idAlimento) {
+		try {
+			RefeicaoModel refeicao = refeicaoRepository.findById(idRefeicao)
+					.orElseThrow(() -> new RefeicaoNaoEncontradoException("Refeicao de id " + idRefeicao + " não encontrada"));
+			AlimentoModel alimento = alimentoRepository.findById(idAlimento)
+					.orElseThrow(() -> new AlimentoNaoEncontradoException("Alimento de id " + idAlimento + " não encontrado"));
+
+			log.info("Adicionando alimento na refeição");
+			refeicao.getAlimentos().add(alimento);
+			atualizaMacroDaRefeicao(refeicao,alimento);
+			return ResponseEntity.ok(new RefeicaoDto(refeicao));
+		} catch (RefeicaoNaoEncontradoException | AlimentoNaoEncontradoException e) {
+			log.info(e.getMessage());
+			return ResponseEntity.badRequest().body(e.getMessage());
+		}
+
 	}
 
 	private void atualizaMacroDaRefeicao(RefeicaoModel refeicao, AlimentoModel alimento) {
-		
 		refeicao.adicionaCarboidratos(alimento.getCarboidrato());
 		refeicao.adicionaCalorias(alimento.getCalorias());
 		refeicao.adicionaProteinas(alimento.getProteina());
 		refeicao.adicionaGorduras(alimento.getGordura());
-		
 		refeicaoRepository.save(refeicao);
-		
 	}
 
 	public ResponseEntity<List<RefeicaoDto>> listaRefeicoes() {
@@ -70,46 +75,62 @@ public class RefeicaoService {
 		return ResponseEntity.ok(RefeicaoDto.converter(refeicoes));
 	}
 
-	public ResponseEntity<RefeicaoDetalharDto> detalhaRefeicao(Long idRefeicao) {
-		RefeicaoModel refeicao = refeicaoRepository.findById(idRefeicao)
-				.orElseThrow(() -> new RefeicaoNaoEncontradoException("Refeicao de id " + idRefeicao + " não encontrada"));
+	public ResponseEntity<?> detalhaRefeicao(Long idRefeicao) {
+		try {
+			RefeicaoModel refeicao = refeicaoRepository.findById(idRefeicao)
+					.orElseThrow(() -> new RefeicaoNaoEncontradoException("Refeicao de id " + idRefeicao + " não encontrada"));
+			return ResponseEntity.ok(new RefeicaoDetalharDto(refeicao));
+		} catch (RefeicaoNaoEncontradoException e) {
+			log.info(e.getMessage());
+			return ResponseEntity.badRequest().body(e.getMessage());
+		}
 
-		return ResponseEntity.ok(new RefeicaoDetalharDto(refeicao));
 	}
 
 	public ResponseEntity<?> removeAlimento(Long idRefeicao, Long idAlimento) {
-
-		RefeicaoModel refeicao = refeicaoRepository.findById(idRefeicao)
-				.orElseThrow(() -> new RefeicaoNaoEncontradoException("Refeicao de id " + idRefeicao + " não encontrada"));
+		try{
+			RefeicaoModel refeicao = refeicaoRepository.findById(idRefeicao)
+					.orElseThrow(() -> new RefeicaoNaoEncontradoException("Refeicao de id " + idRefeicao + " não encontrada"));
 
 			List<AlimentoModel> alimentos = refeicao.getAlimentos();
-			try{
-				alimentos.removeIf(alimento -> alimento.getId().equals(idAlimento));
-				refeicaoRepository.save(refeicao);
-				return ResponseEntity.noContent().build();
-			} catch (Exception e) {
-				e.getMessage();
-				System.out.println("Alimento não encontrado na refeição"); //trocar por log
-				return ResponseEntity.notFound().build();
-			}
+			log.info("Removendo alimento de id {}, caso exista",idAlimento);
+			alimentos.removeIf(alimento -> alimento.getId().equals(idAlimento));//lança uma exception caso não encontre???? (aparentemente não lança)
+			refeicaoRepository.save(refeicao);
+			return ResponseEntity.noContent().build();
+		} catch (RefeicaoNaoEncontradoException e) {
+			log.info(e.getMessage());
+			return ResponseEntity.badRequest().body(e.getMessage());
+		}
+
 	}
 
-    public ResponseEntity<?> atualizaRefeicao(Long idRefeicao, RefeicaoForm form) {
-		RefeicaoModel refeicao = refeicaoRepository.findById(idRefeicao)
-				.orElseThrow(() -> new RefeicaoNaoEncontradoException("Refeicao de id " + idRefeicao + " não encontrada"));
+    public ResponseEntity<?> atualizaRefeicao(RefeicaoUpdateForm form, UriComponentsBuilder uri) {
+		try {
+			refeicaoRepository.findById(form.getId())
+					.orElseThrow(() -> new RefeicaoNaoEncontradoException("Refeicao de id " + form.getId() + " não encontrada"));
+			RefeicaoModel refeicao = form.converter();
+			log.info("Atualizando a refeição de id {}",form.getId());
+			refeicaoRepository.save(refeicao);
+			return ResponseEntity.ok(new RefeicaoDto(refeicao));
+		} catch (RefeicaoNaoEncontradoException e) {
+			RefeicaoForm formCadastro = form.converteParaFormSemId();
+			return cadastraRefeicao(formCadastro,uri);
+		}
 
-		refeicao.setNome(form.getNome());
-		log.info("Atualizando a refeição de id {}",idRefeicao);
-		refeicaoRepository.save(refeicao);
-		return ResponseEntity.noContent().build();
 	}
 
 	public ResponseEntity<?> deletaRefeicao(Long idRefeicao) {
-		RefeicaoModel refeicao = refeicaoRepository.findById(idRefeicao)
-				.orElseThrow(() -> new RefeicaoNaoEncontradoException("Refeicao de id " + idRefeicao + " não encontrada"));
+		try{
+			RefeicaoModel refeicao = refeicaoRepository.findById(idRefeicao)
+					.orElseThrow(() -> new RefeicaoNaoEncontradoException("Refeicao de id " + idRefeicao + " não encontrada"));
 
-		log.info("Deletando a refeição de id {}", idRefeicao);
-		refeicaoRepository.delete(refeicao);
-		return ResponseEntity.ok().build();
+			log.info("Deletando a refeição de id {}", refeicao.getId());
+			refeicaoRepository.delete(refeicao);
+			return ResponseEntity.noContent().build();
+		} catch (RefeicaoNaoEncontradoException e) {
+			log.info(e.getMessage());
+			return ResponseEntity.badRequest().body(e.getMessage());
+		}
+
 	}
 }

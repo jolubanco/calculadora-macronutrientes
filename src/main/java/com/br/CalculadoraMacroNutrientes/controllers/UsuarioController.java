@@ -2,17 +2,12 @@ package com.br.CalculadoraMacroNutrientes.controllers;
 
 import javax.validation.Valid;
 
+import com.br.CalculadoraMacroNutrientes.controllers.forms.UsuarioUpdateForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.br.CalculadoraMacroNutrientes.controllers.dtos.UsuarioDetalharDto;
@@ -37,7 +32,7 @@ public class UsuarioController {
 	
 	@ApiOperation(value = "Detalha informações do usuário")
 	@GetMapping("/{idUsuario}")
-	public ResponseEntity<UsuarioDetalharDto> detalhaUsuario(@PathVariable Long idUsuario) {
+	public ResponseEntity<?> detalhaUsuario(@PathVariable Long idUsuario) {
 		return usuarioService.detalhaUsuario(idUsuario);
 	}
 	
@@ -46,26 +41,46 @@ public class UsuarioController {
 	public ResponseEntity<UsuarioDto> cadastraUsuario(@RequestBody @Valid UsuarioForm form, UriComponentsBuilder uriBuilder) {
 		return usuarioService.cadastraUsuario(form, uriBuilder);
 	}
+
+	@ApiOperation(value = "Atualiza dados do usuário")
+	@PutMapping("/update")
+	public ResponseEntity<?> atualizaUsuario(@RequestBody @Valid UsuarioUpdateForm form) {
+		return usuarioService.atualizaUsuario(form);
+	}
+
+	@ApiOperation(value = "Deleta um usuário")
+	@DeleteMapping("/delete/{idUsuario}")
+	public ResponseEntity<?> deletaUsuario(@PathVariable("idUsuario") Long idUsuario){
+		return usuarioService.deletaUsuario(idUsuario);
+	}
 	
 	@ApiOperation(value = "Associa uma refeição ao usuário a partir da lista já cadastrada, e atualiza as calorias restantes")
 	@PatchMapping("/{idUsuario}/addRefeicao/{idRefeicao}")
-	public ResponseEntity<UsuarioDto> cadastraRefeicao(@PathVariable("idUsuario") Long idUsuario, @PathVariable("idRefeicao") Long idRefeicao) {
+	public ResponseEntity<?> cadastraRefeicao(@PathVariable("idUsuario") Long idUsuario, @PathVariable("idRefeicao") Long idRefeicao) {
 		return usuarioService.cadastraRefeicaoParaUsuario(idUsuario,idRefeicao);
+	}
+
+	@ApiOperation(value = "Remove uma refeicão da lista cadastrada do usuário")
+	@PatchMapping("/{idUsuario}/remove/refeicao/{idRefeicao}")
+	public ResponseEntity<?> removeRefeicaoDoUsuario(@PathVariable("idUsuario") Long idUsuario, @PathVariable("idRefeicao") Long idRefeicao){
+		return usuarioService.removeRefeicaoDoUsuario(idUsuario,idRefeicao);
 	}
 	
 	@ApiOperation(value = "Associa os macronutrientes informados pelo usuário a partir da lista já cadastrada")
 	@PatchMapping("/{idUsuario}/addMacros/{idMacros}")
-	public ResponseEntity<UsuarioDto> cadastraMacros(@PathVariable("idUsuario") Long idUsuario,@PathVariable("idMacros") Long idMacros){
+	public ResponseEntity<?> cadastraMacros(@PathVariable("idUsuario") Long idUsuario,@PathVariable("idMacros") Long idMacros){
 		return usuarioService.cadastraMacros(idUsuario,idMacros);
 	}
-	
+
 	@ApiOperation(value = "Associa um exercício ao usuário a partir da lista já cadastrada")
 	@PatchMapping("/{idUsuario}/addExercicio/{idExercicio}")
-	public ResponseEntity<UsuarioDto> cadastraExercicio(@PathVariable("idUsuario") Long idUsuario, @PathVariable("idExercicio") Long idExercicio){
+	public ResponseEntity<?> cadastraExercicio(@PathVariable("idUsuario") Long idUsuario, @PathVariable("idExercicio") Long idExercicio){
 		return usuarioService.cadastraExercicio(idUsuario,idExercicio);
 	}
-	
-	public ResponseEntity<?> listaRefeicoesDoUsuario(){
-		return null;
+
+	@ApiOperation(value = "Remove um exercício da lista cadastrada do usuário")
+	@PatchMapping("/{idUsuario}/remove/exercicio/{idExercicio}")
+	public ResponseEntity<?> removeExercicioDoUsuario(@PathVariable("idUsuario") Long idUsuario, @PathVariable("idExercicio") Long idExercicio){
+		return usuarioService.removeExercicioDoUsuario(idUsuario,idExercicio);
 	}
 }

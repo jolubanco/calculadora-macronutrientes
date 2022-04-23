@@ -42,8 +42,13 @@ public class RefeicaoModel {
 	public RefeicaoModel(String nome) {
 		this.nome = nome;
 	}
-	
-	public void adicionaCarboidratos(double carboidrato) {
+
+    public RefeicaoModel(Long id, String nome) {
+		this.id = id;
+		this.nome = nome;
+    }
+
+    public void adicionaCarboidratos(double carboidrato) {
 		this.carboidratosTotais += carboidrato;
 	}
 	

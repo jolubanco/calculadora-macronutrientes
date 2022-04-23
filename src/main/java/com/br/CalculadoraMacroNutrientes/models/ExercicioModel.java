@@ -33,6 +33,13 @@ public class ExercicioModel {
 		this.caloriasGastas = caloriasGastas;
 	}
 
+	public ExercicioModel(Long id, double tempo, String modalidade, double caloriasGastas) {
+		this.id = id;
+		this.modalidade = modalidade;
+		this.tempo = tempo;
+		this.caloriasGastas = caloriasGastas;
+	}
+
 	public static List<ExercicioDto> converterDto(List<ExercicioModel> listExercicios) {
 		List<ExercicioDto> listaDto = new ArrayList<ExercicioDto>();
 		listExercicios.forEach(exercicio -> {

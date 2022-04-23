@@ -44,7 +44,14 @@ public class UsuarioModel {
 		this.informacoesUsuario = informacoesUsuario;
 	}
 
-	public void adicionaCaloriaNdc(double caloria) {
+    public UsuarioModel(Long id, String nome, ObjetivoEnumModel objetivo, double necessidadeDiariaCalorias) {
+		this.id = id;
+		this.nome = nome;
+		this.objetivo = objetivo;
+		this.necessidadeDiariaCalorias = necessidadeDiariaCalorias;
+    }
+
+    public void adicionaCaloriaNdc(double caloria) {
 		this.necessidadeDiariaCalorias += caloria;
 	}
 }

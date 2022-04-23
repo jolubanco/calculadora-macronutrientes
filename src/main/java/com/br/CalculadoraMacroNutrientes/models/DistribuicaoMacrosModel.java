@@ -34,7 +34,14 @@ public class DistribuicaoMacrosModel {
 		this.gordura = gordura;
 	}
 
-	public DistribuicaoMacrosDto converterDto() {
+    public DistribuicaoMacrosModel(Long id, double carboidrato, double proteina, double gordura) {
+		this.id = id;
+		this.carboidrato = carboidrato;
+		this.proteina = proteina;
+		this.gordura = gordura;
+    }
+
+    public DistribuicaoMacrosDto converterDto() {
 		return new DistribuicaoMacrosDto(carboidratoDisponivel,proteinaDisponivel,gorduraDisponivel,consumoCaloriasDisponivel);
 	}
 	
