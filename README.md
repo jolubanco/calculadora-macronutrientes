@@ -28,6 +28,43 @@ fiel . [Exemplo](https://www.tuasaude.com/como-calcular-o-gasto-calorico/#:~:tex
 
 ## Payload das requisições disponíveis
 
+### Json completo do usuário
+```json
+{
+    "id": 1,
+    "nome": "Joao",
+    "objetivo": "PERDA_PESO",
+    "necessidadeDiariaCalorias": 2383.3875000000003,
+    "informacoesUsuario": {
+        "peso": 80.5,
+        "altura": 175.0,
+        "idade": 27,
+        "sexo": "MASCULINO"
+    },
+    "distribruicaoMacros": {
+        "carboidratoDisponiveis": 241.5,
+        "proteinaDisponiveis": 161.0,
+        "gorduraDisponiveis": 80.5,
+        "consumoCaloriasDisponivel": 2583.3875000000003
+    },
+    "refeicoes": [
+        {
+            "id": 1,
+            "nome": "jantar",
+            "caloriasTotais": 0.0,
+            "dataCriacao": "2022-04-22"
+        }
+    ],
+    "exercicios": [
+        {
+            "id": 1,
+            "modalidade": "musculacao",
+            "caloriaGasta": 200.0
+        }
+    ]
+}
+```
+
 ### Cadastro de um usuario 
 #### Request
 ```
