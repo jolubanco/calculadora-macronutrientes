@@ -1,4 +1,4 @@
-package com.br.CalculadoraMacroNutrientes.models;
+package com.br.CalculadoraMacroNutrientes.models.enums;
 
 public enum ObjetivoEnumModel {
 	

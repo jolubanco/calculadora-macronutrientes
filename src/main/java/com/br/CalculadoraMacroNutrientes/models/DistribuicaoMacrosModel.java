@@ -42,7 +42,7 @@ public class DistribuicaoMacrosModel {
     }
 
     public DistribuicaoMacrosDto converterDto() {
-		return new DistribuicaoMacrosDto(carboidratoDisponivel,proteinaDisponivel,gorduraDisponivel,consumoCaloriasDisponivel);
+		return new DistribuicaoMacrosDto(carboidrato,proteina,gordura,carboidratoDisponivel,proteinaDisponivel,gorduraDisponivel,consumoCaloriasDisponivel);
 	}
 	
 	public void adicionaCaloriaConsumo(double caloria) {
@@ -53,15 +53,36 @@ public class DistribuicaoMacrosModel {
 		consumoCaloriasDisponivel -= calorias;
 	}
 
-	public void subtraiCarboidrato(double carboidratos) {
+	public void subtraiCarboidratoDisponivel(double carboidratos) {
 		this.carboidratoDisponivel -= carboidratos;
 	}
 
-	public void subtraiProteina(double proteinas) {
+	public void subtraiProteinaDisponivel(double proteinas) {
 		this.proteinaDisponivel -= proteinas;
 	}
 
-	public void subtraiGordura(double gorduras) {
+	public void subtraiGorduraDisponivel(double gorduras) {
 		this.gorduraDisponivel -= gorduras;
+	}
+
+	public void adicionaCarboidrato(double caloriasGastas) {
+		this.carboidrato += caloriasGastas/4;
+	}
+
+	public void adicionaCarboidratoDisponivelAPartirDaCaloria(double caloriasGastas) {
+		this.carboidratoDisponivel += caloriasGastas/4;
+		adicionaCarboidrato(caloriasGastas);
+	}
+
+	public void adicionaCarboidratoDisponivel(double carboidrato) {
+		this.carboidratoDisponivel += carboidrato;
+	}
+
+	public void adicionaProteinaDisponivel(double proteina) {
+		this.proteinaDisponivel += proteina;
+	}
+
+	public void adicionaGorguraDisponivel(double gordura) {
+		this.gorduraDisponivel += gordura;
 	}
 }

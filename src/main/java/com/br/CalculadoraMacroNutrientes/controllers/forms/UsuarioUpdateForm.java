@@ -1,6 +1,9 @@
 package com.br.CalculadoraMacroNutrientes.controllers.forms;
 
 import com.br.CalculadoraMacroNutrientes.models.*;
+import com.br.CalculadoraMacroNutrientes.models.enums.FatorAtividadeFisicaEnum;
+import com.br.CalculadoraMacroNutrientes.models.enums.ObjetivoEnumModel;
+import com.br.CalculadoraMacroNutrientes.models.enums.SexoEnum;
 import com.br.CalculadoraMacroNutrientes.repositories.InformacoesUsuarioRepository;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -32,18 +35,18 @@ public class UsuarioUpdateForm {
 	@NotNull @NotBlank
 	private String sexo;
 	@NotNull @NotBlank
-	private String fatorAtividadeFisica;
+	private String fatorAtividade;
 	@NotNull
 	private double taxaMetabolismoBasal;
 
 	public UsuarioModel converter(InformacoesUsuarioRepository informacoesUsuarioRepository) {
-		InformacoesUsuarioModel infoUsuario = new InformacoesUsuarioModel(peso,altura,idade,SexoEnum.valueOf(sexo),FatorAtividadeFisicaEnum.valueOf(fatorAtividadeFisica));
+		InformacoesUsuarioModel infoUsuario = new InformacoesUsuarioModel(peso,altura,idade, SexoEnum.valueOf(sexo), FatorAtividadeFisicaEnum.valueOf(fatorAtividade));
 		informacoesUsuarioRepository.save(infoUsuario);
 		return new UsuarioModel(nome, ObjetivoEnumModel.valueOf(objetivo), infoUsuario);
 	}
 
 	public InformacoesUsuarioModel converteInfomacoesUsuario() {
-		return new InformacoesUsuarioModel(peso,altura,idade,SexoEnum.valueOf(sexo),FatorAtividadeFisicaEnum.valueOf(fatorAtividadeFisica),taxaMetabolismoBasal);
+		return new InformacoesUsuarioModel(peso,altura,idade,SexoEnum.valueOf(sexo),FatorAtividadeFisicaEnum.valueOf(fatorAtividade),taxaMetabolismoBasal);
 	}
 
 	public UsuarioModel converterUsuario() {

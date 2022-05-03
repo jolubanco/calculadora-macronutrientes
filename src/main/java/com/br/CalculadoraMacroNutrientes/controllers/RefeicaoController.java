@@ -8,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.br.CalculadoraMacroNutrientes.controllers.dtos.RefeicaoDetalharDto;
 import com.br.CalculadoraMacroNutrientes.controllers.dtos.RefeicaoDto;
 import com.br.CalculadoraMacroNutrientes.controllers.forms.RefeicaoForm;
 import com.br.CalculadoraMacroNutrientes.services.RefeicaoService;
@@ -23,8 +22,7 @@ public class RefeicaoController {
 	
 	@Autowired
 	private RefeicaoService refeicaoService;
-	
-	//verificar se faz sentido esse endpoint
+
 	@ApiOperation(value = "Lista todas as refeições cadastradas")
 	@GetMapping
 	public ResponseEntity<List<RefeicaoDto>> listaRefeicoesPorUsuario(){
@@ -48,16 +46,16 @@ public class RefeicaoController {
 		return refeicaoService.atualizaRefeicao(form,uriBuilder);
 	}
 	
-	@ApiOperation(value = "Adiciona alimentos cadastrados em uma refeição já cadastrada")
-	@PatchMapping("/{idRefeicao}/addAlimento/{idAlimento}")
-	public ResponseEntity<?> adicionaAlimentoNaRefeicao(@PathVariable("idRefeicao") Long idRefeicao, @PathVariable("idAlimento") Long idAlimento) {
-		return refeicaoService.adicionaAlimentoNaRefeicao(idRefeicao,idAlimento);
+	@ApiOperation(value = "Adiciona alimentos cadastrados em uma refeição já cadastrada, caso seja passado o id do usuário significa que a refeição já está associada ao usuário e precisamo atualizar os macros disponíveis caso haja alteração de alimentos")
+	@PatchMapping("/{idRefeicao}/add/alimento/{idAlimento}")
+	public ResponseEntity<?> adicionaAlimentoNaRefeicao(@PathVariable("idRefeicao") Long idRefeicao, @PathVariable("idAlimento") Long idAlimento, Long idUsuario) {
+		return refeicaoService.adicionaAlimentoNaRefeicao(idRefeicao,idAlimento,idUsuario);
 	}
 
-	@ApiOperation(value="Remove um alimento da refeição")
-	@PatchMapping("/{idRefeicao}/removeAlimento/{idAlimento}")
-	public ResponseEntity<?> removeAlimentoDaRefeicao(@PathVariable("idRefeicao") Long idRefeicao, @PathVariable("idAlimento") Long idAlimento){
-		return refeicaoService.removeAlimento(idRefeicao,idAlimento);
+	@ApiOperation(value="Remove um alimento da refeição e caso seja passado o parâmetro idUsuario, no qual a refeição está vinculada, os macros são atualizados no usuário")
+	@PatchMapping("/{idRefeicao}/remove/alimento/{idAlimento}")
+	public ResponseEntity<?> removeAlimentoDaRefeicao(@PathVariable("idRefeicao") Long idRefeicao, @PathVariable("idAlimento") Long idAlimento, Long idUsuario){
+		return refeicaoService.removeAlimentoNaRefeicao(idRefeicao,idAlimento,idUsuario);
 	}
 
 	@ApiOperation(value="Deleta uma refeição")

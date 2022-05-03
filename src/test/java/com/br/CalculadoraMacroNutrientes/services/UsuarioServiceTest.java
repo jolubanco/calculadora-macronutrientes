@@ -5,7 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.br.CalculadoraMacroNutrientes.models.InformacoesUsuarioModel;
-import com.br.CalculadoraMacroNutrientes.models.SexoEnum;
+import com.br.CalculadoraMacroNutrientes.models.enums.SexoEnum;
 import com.br.CalculadoraMacroNutrientes.models.UsuarioModel;
 
 public class UsuarioServiceTest {

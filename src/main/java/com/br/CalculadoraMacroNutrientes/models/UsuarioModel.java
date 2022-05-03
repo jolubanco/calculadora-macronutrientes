@@ -13,6 +13,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import com.br.CalculadoraMacroNutrientes.models.enums.ObjetivoEnumModel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -28,7 +29,7 @@ public class UsuarioModel {
 	private String nome;
 	@Enumerated(EnumType.STRING)
 	private ObjetivoEnumModel objetivo;
-	private double necessidadeDiariaCalorias;
+	private double necessidadeDiariaCalorias = 0;
 	@OneToOne
 	private InformacoesUsuarioModel informacoesUsuario;
 	@OneToOne

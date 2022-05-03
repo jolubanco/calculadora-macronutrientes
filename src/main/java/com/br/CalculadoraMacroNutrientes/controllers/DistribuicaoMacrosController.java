@@ -22,7 +22,7 @@ public class DistribuicaoMacrosController {
 	private DistribuicaoMacrosService distribuicaoMacrosService; 
 
 	@ApiOperation(value = "Define os macronutrientes informados pelo usuário")
-	@PostMapping("/macros")
+	@PostMapping("/set")
 	public ResponseEntity<DistribuicaoMacrosDto> defineMacrosUsuario(@RequestBody @Valid MacrosForm form, UriComponentsBuilder uriBuilder) {
 		return distribuicaoMacrosService.defineMacrosUsuario(form,uriBuilder);
 	}

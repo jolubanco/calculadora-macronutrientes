@@ -3,12 +3,10 @@ package com.br.CalculadoraMacroNutrientes.controllers.forms;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-import org.hibernate.validator.constraints.Length;
-
-import com.br.CalculadoraMacroNutrientes.models.FatorAtividadeFisicaEnum;
+import com.br.CalculadoraMacroNutrientes.models.enums.FatorAtividadeFisicaEnum;
 import com.br.CalculadoraMacroNutrientes.models.InformacoesUsuarioModel;
-import com.br.CalculadoraMacroNutrientes.models.ObjetivoEnumModel;
-import com.br.CalculadoraMacroNutrientes.models.SexoEnum;
+import com.br.CalculadoraMacroNutrientes.models.enums.ObjetivoEnumModel;
+import com.br.CalculadoraMacroNutrientes.models.enums.SexoEnum;
 import com.br.CalculadoraMacroNutrientes.models.UsuarioModel;
 import com.br.CalculadoraMacroNutrientes.repositories.InformacoesUsuarioRepository;
 

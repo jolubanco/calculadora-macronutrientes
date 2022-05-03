@@ -7,25 +7,26 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Table(name="TB_ALM_DOM")
 @Data
 @NoArgsConstructor
+@Builder //teste
 public class AlimentoDominio {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Setter(AccessLevel.NONE) //(TESTE) não permite que seja criado os setter atraves do @Data
 	private Long id;
 	@ApiModelProperty(value = "Nome do alimento")
 	private String nome;
-	private double quantidade = 0.0;
-	private double carboidrato = 0.0;
-	private double proteina = 0.0;
-	private double gordura = 0.0;
-	private double calorias = 0.0;
+	private double quantidade;
+	private double carboidrato;
+	private double proteina;
+	private double gordura;
+	private double calorias;
 	
 	public AlimentoDominio(String nome, double quantidade, double carboidrato, double proteina, double gordura, double calorias) {
 		this.nome = nome;

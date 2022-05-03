@@ -1,4 +1,4 @@
-package com.br.CalculadoraMacroNutrientes.models;
+package com.br.CalculadoraMacroNutrientes.models.enums;
 
 import lombok.Getter;
 
@@ -7,7 +7,7 @@ public enum FatorAtividadeFisicaEnum {
 	
 	SEDENTARIO(1.2),
 	LEVEMENTE_ATIVO(1.375),
-	MODERADAMENTO_ATIVO(1.55),
+	MODERADAMENTE_ATIVO(1.55),
 	ALTAMENTE_ATIVO(1.725),
 	EXTREMAMENTE_ATIVO(1.9);
 	

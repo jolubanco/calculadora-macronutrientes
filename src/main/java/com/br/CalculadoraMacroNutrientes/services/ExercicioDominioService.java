@@ -41,15 +41,23 @@ public class ExercicioDominioService {
 					.orElseThrow(() -> new ExercicioNaoEncontradoException("Exercício de id " + idExercicioDominio + " não encontrado"));
 			return ResponseEntity.ok(new ExercicioDominioDetalharDto(exercicio));
 		} catch (ExercicioNaoEncontradoException e) {
-			log.info(e.getMessage());
+			log.error(e.getMessage());
 			return ResponseEntity.badRequest().body(e.getMessage());
 		}
 
 	}
 
-	public ResponseEntity<List<ExercicioDominioDto>> listaExerciciosDominio() {
-		List<ExercicioDominio> exercicios = exercicioDominioRepository.findAll();
-		return ResponseEntity.ok(ExercicioDominioDto.converter(exercicios));
+	public ResponseEntity<List<ExercicioDominioDto>> listaExerciciosDominio(String modalidade) {
+		if(modalidade == null){
+			List<ExercicioDominio> exercicios = exercicioDominioRepository.findAll();
+			log.info("Exibindo lista de exercícios de domínio");
+			return ResponseEntity.ok(ExercicioDominioDto.converter(exercicios));
+		} else {
+			List<ExercicioDominio> exercicios = exercicioDominioRepository.findByModalidadeContaining(modalidade);
+			log.info("Buscando exercício de domínio de nome {}",modalidade);
+			return ResponseEntity.ok(ExercicioDominioDto.converter(exercicios));
+		}
+
 	}
 
 	public ResponseEntity<ExercicioDominioDto> atualizaExercicioDominio(ExercicioDominioUpdateForm form,UriComponentsBuilder uri) {
@@ -74,7 +82,7 @@ public class ExercicioDominioService {
 			exercicioDominioRepository.delete(exercicioDominio);
 			return ResponseEntity.noContent().build();
 		} catch (ExercicioNaoEncontradoException e) {
-			log.info(e.getMessage());
+			log.error(e.getMessage());
 			return ResponseEntity.badRequest().body(e.getMessage());
 		}
 

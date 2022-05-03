@@ -48,6 +48,7 @@ public class RefeicaoModel {
 		this.nome = nome;
     }
 
+	//refatorar o nome dos métos para adicionaCarboidratosTotais
     public void adicionaCarboidratos(double carboidrato) {
 		this.carboidratosTotais += carboidrato;
 	}
@@ -63,7 +64,7 @@ public class RefeicaoModel {
 	public void adicionaCalorias(double caloria) {
 		this.caloriasTotais += caloria;
 	}
-	
+	//
 	public static List<RefeicaoDto> converterDto(List<RefeicaoModel> listaRefeicao ) {
 		List<RefeicaoDto> listaDto = new ArrayList<RefeicaoDto>();
 		listaRefeicao.forEach(refeicao -> {
@@ -72,4 +73,19 @@ public class RefeicaoModel {
 		return listaDto;
 	}
 
+    public void subtraiCarboitradosTotais(double carboidrato) {
+		this.carboidratosTotais -= carboidrato;
+    }
+
+	public void subtraiProteinasTotais(double proteinas) {
+		this.proteinasTotais -= proteinas;
+	}
+
+	public void subtraiCaloriasTotais(double calorias) {
+		this.caloriasTotais -= calorias;
+	}
+
+	public void subtraiGordurasTotais(double gordura) {
+		this.gordurasTotais -= gordura;
+	}
 }

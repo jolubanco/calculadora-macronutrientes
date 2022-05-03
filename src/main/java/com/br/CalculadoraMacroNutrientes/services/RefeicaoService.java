@@ -2,12 +2,13 @@ package com.br.CalculadoraMacroNutrientes.services;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Optional;
 
 import com.br.CalculadoraMacroNutrientes.controllers.forms.RefeicaoUpdateForm;
 import com.br.CalculadoraMacroNutrientes.exceptions.AlimentoNaoEncontradoException;
 import com.br.CalculadoraMacroNutrientes.exceptions.RefeicaoNaoEncontradoException;
 import com.br.CalculadoraMacroNutrientes.exceptions.UsuarioNaoEncontradoException;
+import com.br.CalculadoraMacroNutrientes.models.UsuarioModel;
+import com.br.CalculadoraMacroNutrientes.repositories.UsuarioRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -28,11 +29,14 @@ public class RefeicaoService {
 	
 	private RefeicaoRepository refeicaoRepository;
 	private AlimentoRepository alimentoRepository;
+	//ver se é uma boa prática
+	private UsuarioRepository usuarioRepository;
 	
 	@Autowired
-	public RefeicaoService(RefeicaoRepository refeicaoRepository, AlimentoRepository alimentoRepository) {
+	public RefeicaoService(RefeicaoRepository refeicaoRepository, AlimentoRepository alimentoRepository,UsuarioRepository usuarioRepository ) {
 		this.refeicaoRepository = refeicaoRepository;
 		this.alimentoRepository = alimentoRepository;
+		this.usuarioRepository = usuarioRepository;
 	}
 
 	public ResponseEntity<RefeicaoDto> cadastraRefeicao(RefeicaoForm form, UriComponentsBuilder uriBuilder) {
@@ -44,7 +48,7 @@ public class RefeicaoService {
 		return ResponseEntity.created(uri).body(new RefeicaoDto(refeicao));
 	}
 
-	public ResponseEntity<?> adicionaAlimentoNaRefeicao(Long idRefeicao, Long idAlimento) {
+	public ResponseEntity<?> adicionaAlimentoNaRefeicao(Long idRefeicao, Long idAlimento, Long idUsuario) {
 		try {
 			RefeicaoModel refeicao = refeicaoRepository.findById(idRefeicao)
 					.orElseThrow(() -> new RefeicaoNaoEncontradoException("Refeicao de id " + idRefeicao + " não encontrada"));
@@ -53,20 +57,68 @@ public class RefeicaoService {
 
 			log.info("Adicionando alimento na refeição");
 			refeicao.getAlimentos().add(alimento);
-			atualizaMacroDaRefeicao(refeicao,alimento);
+			adicionaMacrosDaRefeicao(refeicao,alimento);
+
+			if(idUsuario != null) {
+				subtraiMacrosDisponiveisDoUsuario(idUsuario,alimento);
+			}
 			return ResponseEntity.ok(new RefeicaoDto(refeicao));
 		} catch (RefeicaoNaoEncontradoException | AlimentoNaoEncontradoException e) {
-			log.info(e.getMessage());
+			log.error(e.getMessage());
 			return ResponseEntity.badRequest().body(e.getMessage());
 		}
 
 	}
 
-	private void atualizaMacroDaRefeicao(RefeicaoModel refeicao, AlimentoModel alimento) {
+	private void adicionaMacrosDisponiveisDoUsuario(Long idUsuario, AlimentoModel alimento) {
+		try{
+			UsuarioModel usuario = usuarioRepository.findById(idUsuario)
+					.orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário de id " + idUsuario + " não encontrado"));
+			log.info("Atualizando os macros disponíveis do usuário após a remoção de um alimento");
+
+			usuario.getDistribruicaoMacros().adicionaCaloriaConsumo(alimento.getCalorias());
+			usuario.getDistribruicaoMacros().adicionaCarboidratoDisponivel(alimento.getCarboidrato());
+			usuario.getDistribruicaoMacros().adicionaProteinaDisponivel(alimento.getProteina());
+			usuario.getDistribruicaoMacros().adicionaGorguraDisponivel(alimento.getGordura());
+
+			log.info("Salvando os dados do usuário atualizados");
+			usuarioRepository.save(usuario);
+		} catch (UsuarioNaoEncontradoException e) {
+			log.info(e.getMessage());
+		}
+	}
+
+	private void subtraiMacrosDisponiveisDoUsuario(Long idUsuario, AlimentoModel alimento) {
+		try{
+			UsuarioModel usuario = usuarioRepository.findById(idUsuario)
+					.orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário de id " + idUsuario + " não encontrado"));
+			log.info("Atualizando os macros disponíveis do usuário após a inserção de um alimento");
+
+			usuario.getDistribruicaoMacros().subtraiCaloriaConsumo(alimento.getCalorias());
+			usuario.getDistribruicaoMacros().subtraiCarboidratoDisponivel(alimento.getCarboidrato());
+			usuario.getDistribruicaoMacros().subtraiProteinaDisponivel(alimento.getProteina());
+			usuario.getDistribruicaoMacros().subtraiGorduraDisponivel(alimento.getGordura());
+
+			log.info("Salvando os dados do usuário atualizados");
+			usuarioRepository.save(usuario);
+		} catch (UsuarioNaoEncontradoException e) {
+			log.info(e.getMessage());
+		}
+	}
+
+	private void adicionaMacrosDaRefeicao(RefeicaoModel refeicao, AlimentoModel alimento) {
 		refeicao.adicionaCarboidratos(alimento.getCarboidrato());
 		refeicao.adicionaCalorias(alimento.getCalorias());
 		refeicao.adicionaProteinas(alimento.getProteina());
 		refeicao.adicionaGorduras(alimento.getGordura());
+		refeicaoRepository.save(refeicao);
+	}
+
+	private void subtraiMacrosDaRefeicao(RefeicaoModel refeicao, AlimentoModel alimento) {
+		refeicao.subtraiCarboitradosTotais(alimento.getCarboidrato());
+		refeicao.subtraiCaloriasTotais(alimento.getCalorias());
+		refeicao.subtraiProteinasTotais(alimento.getProteina());
+		refeicao.subtraiGordurasTotais(alimento.getGordura());
 		refeicaoRepository.save(refeicao);
 	}
 
@@ -81,25 +133,37 @@ public class RefeicaoService {
 					.orElseThrow(() -> new RefeicaoNaoEncontradoException("Refeicao de id " + idRefeicao + " não encontrada"));
 			return ResponseEntity.ok(new RefeicaoDetalharDto(refeicao));
 		} catch (RefeicaoNaoEncontradoException e) {
-			log.info(e.getMessage());
+			log.error(e.getMessage());
 			return ResponseEntity.badRequest().body(e.getMessage());
 		}
 
 	}
 
-	public ResponseEntity<?> removeAlimento(Long idRefeicao, Long idAlimento) {
+	public ResponseEntity<?> removeAlimentoNaRefeicao(Long idRefeicao, Long idAlimento, Long idUsuario) {
 		try{
 			RefeicaoModel refeicao = refeicaoRepository.findById(idRefeicao)
 					.orElseThrow(() -> new RefeicaoNaoEncontradoException("Refeicao de id " + idRefeicao + " não encontrada"));
 
+			AlimentoModel alimento = refeicao.getAlimentos()
+					.stream()
+					.filter(alimentoConsultado -> alimentoConsultado.getId().equals(idAlimento))
+					.findFirst().orElseThrow(() -> new AlimentoNaoEncontradoException("Alimento de id " + idAlimento + " não encontrado"));
+
 			List<AlimentoModel> alimentos = refeicao.getAlimentos();
 			log.info("Removendo alimento de id {}, caso exista",idAlimento);
-			alimentos.removeIf(alimento -> alimento.getId().equals(idAlimento));//lança uma exception caso não encontre???? (aparentemente não lança)
+			alimentos.removeIf(alimentoASerRemovido -> alimentoASerRemovido.getId().equals(idAlimento));
+
+			subtraiMacrosDaRefeicao(refeicao,alimento);
+
+			if(idUsuario != null) {
+				adicionaMacrosDisponiveisDoUsuario(idUsuario,alimento);
+			}
+
 			refeicaoRepository.save(refeicao);
 			return ResponseEntity.noContent().build();
-		} catch (RefeicaoNaoEncontradoException e) {
-			log.info(e.getMessage());
-			return ResponseEntity.badRequest().body(e.getMessage());
+		} catch (RefeicaoNaoEncontradoException | AlimentoNaoEncontradoException e) {
+			log.error(e.getMessage());
+			return ResponseEntity.notFound().build();
 		}
 
 	}
@@ -128,7 +192,7 @@ public class RefeicaoService {
 			refeicaoRepository.delete(refeicao);
 			return ResponseEntity.noContent().build();
 		} catch (RefeicaoNaoEncontradoException e) {
-			log.info(e.getMessage());
+			log.error(e.getMessage());
 			return ResponseEntity.badRequest().body(e.getMessage());
 		}
 

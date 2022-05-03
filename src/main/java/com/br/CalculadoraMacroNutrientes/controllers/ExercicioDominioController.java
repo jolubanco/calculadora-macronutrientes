@@ -25,8 +25,8 @@ public class ExercicioDominioController {
 	
 	@ApiOperation(value = "Lista todos os exercícios de domínio")
 	@GetMapping
-	public ResponseEntity<List<ExercicioDominioDto>> listaExerciciosDominio(){
-		return exercicioDominioService.listaExerciciosDominio();
+	public ResponseEntity<List<ExercicioDominioDto>> listaExerciciosDominio(String modalidade){
+		return exercicioDominioService.listaExerciciosDominio(modalidade);
 	}
 	
 	@ApiOperation(value = "Detalha exercício de domínio cadastrado")

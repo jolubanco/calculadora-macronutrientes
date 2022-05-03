@@ -44,7 +44,7 @@ public class ExercicioService {
 			double caloriasGastas = (exercicioReferencia.getCaloriasGastas()*tempoExecucao)/(exercicioReferencia.getTempo());
 			return new ExercicioModel(modalidade, tempoExecucao, caloriasGastas);
 		} catch (ExercicioNaoEncontradoException e) {
-			log.info(e.getMessage());
+			log.error(e.getMessage());
 			return null;
 		}
 
@@ -57,7 +57,7 @@ public class ExercicioService {
 	        URI uri = uriBuilder.path("/exercicios/{id}").buildAndExpand(exercicio.getId()).toUri();
 	        return ResponseEntity.created(uri).body(new ExercicioDto(exercicio));
 		} catch(Exception e) {
-			log.info(e.getMessage());
+			log.error(e.getMessage());
 			return ResponseEntity.badRequest().body(e.getMessage());
 		}
 	}
@@ -69,7 +69,7 @@ public class ExercicioService {
 			log.info("Detalhando exercicio de id {}",exercicio.getId());
 			return ResponseEntity.ok(new ExercicioDetalharDto(exercicio));
 		} catch (ExercicioNaoEncontradoException e) {
-			log.info(e.getMessage());
+			log.error(e.getMessage());
 			return ResponseEntity.badRequest().body(e.getMessage());
 		}
 
@@ -88,7 +88,7 @@ public class ExercicioService {
 			exercicioRepository.delete(exercicio);
 			return ResponseEntity.noContent().build();
 		} catch(ExercicioNaoEncontradoException e){
-			log.info(e.getMessage());
+			log.error(e.getMessage());
 			return ResponseEntity.badRequest().body(e.getMessage());
 		}
 	}
@@ -103,7 +103,7 @@ public class ExercicioService {
 			exercicioRepository.save(exercicio);
 			return ResponseEntity.noContent().build();
 		} catch (ExercicioNaoEncontradoException e) {
-			log.info(e.getMessage());
+			log.error(e.getMessage());
 			return ResponseEntity.badRequest().body(e.getMessage());
 		}
 	}

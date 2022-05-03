@@ -10,6 +10,8 @@ import javax.persistence.Table;
 
 import com.br.CalculadoraMacroNutrientes.controllers.dtos.InformacoesUsuarioDto;
 
+import com.br.CalculadoraMacroNutrientes.models.enums.FatorAtividadeFisicaEnum;
+import com.br.CalculadoraMacroNutrientes.models.enums.SexoEnum;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

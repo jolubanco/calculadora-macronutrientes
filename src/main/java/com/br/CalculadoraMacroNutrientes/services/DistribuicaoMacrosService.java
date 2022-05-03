@@ -27,12 +27,9 @@ public class DistribuicaoMacrosService {
 	}
 
 	public ResponseEntity<DistribuicaoMacrosDto> defineMacrosUsuario(MacrosForm form, UriComponentsBuilder uriBuilder) {
-
 		DistribuicaoMacrosModel distruicaoMacros = form.converter();
 		distribuicaoMacrosRepository.save(distruicaoMacros);
-
 		URI uri = uriBuilder.path("/macros/{id}").buildAndExpand(distruicaoMacros.getId()).toUri();
-
 		return ResponseEntity.created(uri).body(new DistribuicaoMacrosDto(distruicaoMacros));
 	}
 
@@ -45,7 +42,7 @@ public class DistribuicaoMacrosService {
 			distribuicaoMacrosRepository.save(dist);
 			return ResponseEntity.noContent().build();
 		} catch (DistribuicaoMacrosNaoEncontradoException e) {
-			log.info(e.getMessage());
+			log.error(e.getMessage());
 			return ResponseEntity.badRequest().body(e.getMessage());
 		}
 	}

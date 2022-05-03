@@ -4,8 +4,10 @@ import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
+import com.br.CalculadoraMacroNutrientes.controllers.dtos.ExercicioDominioDto;
 import com.br.CalculadoraMacroNutrientes.controllers.forms.AlimentoDominioUpdateForm;
 import com.br.CalculadoraMacroNutrientes.exceptions.AlimentoNaoEncontradoException;
+import io.swagger.models.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -44,16 +46,22 @@ public class AlimentoDominioService {
 			log.info("Detalhando alimento de domínio");
 			return ResponseEntity.ok(new AlimentoDominioDetalharDto(alimentoDominio));
 		} catch (AlimentoNaoEncontradoException e) {
-			log.info(e.getMessage());
+			log.error(e.getMessage());
 			return ResponseEntity.badRequest().body(e.getMessage());
 		}
 
 	}
 
-	public ResponseEntity<List<AlimentoDominioDto>> listaAlimentos() {
-		List<AlimentoDominio> alimentos = alimentoDominioRepository.findAll();
-		log.info("Exibindo lista de alimentos de domínio");
-		return ResponseEntity.ok(AlimentoDominioDto.converter(alimentos));
+	public ResponseEntity<List<AlimentoDominioDto>> listaAlimentos(String nome) {
+		if (nome == null){
+			List<AlimentoDominio> alimentos = alimentoDominioRepository.findAll();
+			log.info("Exibindo lista de alimentos de domínio");
+			return ResponseEntity.ok(AlimentoDominioDto.converter(alimentos));
+		} else {
+				List<AlimentoDominio> alimentos = alimentoDominioRepository.findByNomeContaining(nome);
+				log.info("Buscando alimento de domínio de nome {}",nome);
+				return ResponseEntity.ok(AlimentoDominioDto.converter(alimentos));
+		}
 	}
 
     public ResponseEntity<?> deletaAlimentoDominio(Long idAlimentoDominio) {
@@ -64,7 +72,7 @@ public class AlimentoDominioService {
 			alimentoDominioRepository.delete(alimentoDominio);
 			return ResponseEntity.noContent().build();
 		} catch (AlimentoNaoEncontradoException e){
-			log.info(e.getMessage());
+			log.error(e.getMessage());
 			return ResponseEntity.badRequest().body(e.getMessage());
 		}
     }
@@ -79,7 +87,7 @@ public class AlimentoDominioService {
 			return ResponseEntity.noContent().build();
 		} catch (AlimentoNaoEncontradoException e) {
 			AlimentoDominioForm formCadastro = form.converteParaFormSemId();
-			log.info(e.getMessage());
+			log.error(e.getMessage());
 			return cadastraAlimentoDominio(formCadastro,uri);
 		}
 	}

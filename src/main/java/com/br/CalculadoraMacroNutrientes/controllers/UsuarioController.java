@@ -55,7 +55,7 @@ public class UsuarioController {
 	}
 	
 	@ApiOperation(value = "Associa uma refeição ao usuário a partir da lista já cadastrada, e atualiza as calorias restantes")
-	@PatchMapping("/{idUsuario}/addRefeicao/{idRefeicao}")
+	@PatchMapping("/{idUsuario}/add/refeicao/{idRefeicao}")
 	public ResponseEntity<?> cadastraRefeicao(@PathVariable("idUsuario") Long idUsuario, @PathVariable("idRefeicao") Long idRefeicao) {
 		return usuarioService.cadastraRefeicaoParaUsuario(idUsuario,idRefeicao);
 	}
@@ -67,13 +67,13 @@ public class UsuarioController {
 	}
 	
 	@ApiOperation(value = "Associa os macronutrientes informados pelo usuário a partir da lista já cadastrada")
-	@PatchMapping("/{idUsuario}/addMacros/{idMacros}")
+	@PatchMapping("/{idUsuario}/add/macros/{idMacros}")
 	public ResponseEntity<?> cadastraMacros(@PathVariable("idUsuario") Long idUsuario,@PathVariable("idMacros") Long idMacros){
 		return usuarioService.cadastraMacros(idUsuario,idMacros);
 	}
 
 	@ApiOperation(value = "Associa um exercício ao usuário a partir da lista já cadastrada")
-	@PatchMapping("/{idUsuario}/addExercicio/{idExercicio}")
+	@PatchMapping("/{idUsuario}/add/exercicio/{idExercicio}")
 	public ResponseEntity<?> cadastraExercicio(@PathVariable("idUsuario") Long idUsuario, @PathVariable("idExercicio") Long idExercicio){
 		return usuarioService.cadastraExercicio(idUsuario,idExercicio);
 	}
@@ -82,5 +82,17 @@ public class UsuarioController {
 	@PatchMapping("/{idUsuario}/remove/exercicio/{idExercicio}")
 	public ResponseEntity<?> removeExercicioDoUsuario(@PathVariable("idUsuario") Long idUsuario, @PathVariable("idExercicio") Long idExercicio){
 		return usuarioService.removeExercicioDoUsuario(idUsuario,idExercicio);
+	}
+
+	@ApiOperation(value = "Atualiza peso do usuário e recalcula os dados")
+	@PatchMapping("/{idUsuario}/update/peso/{valorPeso}")
+	public ResponseEntity<?> atualizarPeso(@PathVariable("idUsuario") Long idUsuario,@PathVariable("valorPeso") double valorPeso){
+		return usuarioService.atualizarPeso(idUsuario,valorPeso);
+	}
+
+	@ApiOperation(value = "Atualiza objetivo do usuário e recalcula os dados")
+	@PatchMapping("/{idUsuario}/update/objetivo/{objetivo}")
+	public ResponseEntity<?> atualizarObjetivo(@PathVariable("idUsuario") Long idUsuario,@PathVariable("objetivo") String objetivo){
+		return usuarioService.atualizarObjetivo(idUsuario,objetivo);
 	}
 }

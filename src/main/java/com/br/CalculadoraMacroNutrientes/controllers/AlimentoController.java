@@ -15,6 +15,7 @@ import com.br.CalculadoraMacroNutrientes.services.AlimentoService;
 
 import io.swagger.annotations.ApiOperation;
 
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 
 @RestController
@@ -37,6 +38,7 @@ public class AlimentoController {
 	}
 	
 	@ApiOperation(value = "Cadastra um alimento a partir dos alimentos de domínio")
+	@Transactional
 	@PostMapping
 	public ResponseEntity<AlimentoDto> cadastraAlimento(@RequestBody AlimentoForm form,UriComponentsBuilder uriBuilder) {
 		return alimentoService.cadastraAlimento(form, uriBuilder);

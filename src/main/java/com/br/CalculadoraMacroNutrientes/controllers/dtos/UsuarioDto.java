@@ -1,14 +1,11 @@
 package com.br.CalculadoraMacroNutrientes.controllers.dtos;
 
-import java.util.List;
-
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 
 import org.springframework.data.domain.Page;
 
-import com.br.CalculadoraMacroNutrientes.models.ObjetivoEnumModel;
-import com.br.CalculadoraMacroNutrientes.models.RefeicaoModel;
+import com.br.CalculadoraMacroNutrientes.models.enums.ObjetivoEnumModel;
 import com.br.CalculadoraMacroNutrientes.models.UsuarioModel;
 
 import lombok.Data;

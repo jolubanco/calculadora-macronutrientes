@@ -15,6 +15,7 @@ import com.br.CalculadoraMacroNutrientes.services.AlimentoDominioService;
 
 import io.swagger.annotations.ApiOperation;
 
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 
 @RestController
@@ -24,10 +25,10 @@ public class AlimentoDominioController {
 	@Autowired
 	private AlimentoDominioService alimentoDominioService;
 	
-	@ApiOperation(value = "Lista todos os alimentos de domínio cadastrados")
+	@ApiOperation(value = "Lista todos os alimentos de domínio cadastrados, e filtra pelo nome do alimento caso seja informado via parâmetro")
 	@GetMapping
-	public ResponseEntity<List<AlimentoDominioDto>> listaAlimentos(){
-		return alimentoDominioService.listaAlimentos();	
+	public ResponseEntity<List<AlimentoDominioDto>> listaAlimentos(String nome){
+		return alimentoDominioService.listaAlimentos(nome);
 	}
 	
 	@ApiOperation(value = "Detalha o alimento de domínio cadastrado")
@@ -37,6 +38,7 @@ public class AlimentoDominioController {
 	}
 	
 	@ApiOperation(value = "Cadastra um alimento de domínio")
+	@Transactional
 	@PostMapping
 	public ResponseEntity<AlimentoDominioDetalharDto> cadastraAlimentoDominio(@RequestBody @Valid AlimentoDominioForm form, UriComponentsBuilder uriBuilder){
 		return alimentoDominioService.cadastraAlimentoDominio(form,uriBuilder);
