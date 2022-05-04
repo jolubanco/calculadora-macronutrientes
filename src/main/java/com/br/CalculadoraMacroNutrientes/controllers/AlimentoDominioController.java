@@ -44,6 +44,7 @@ public class AlimentoDominioController {
 		return alimentoDominioService.cadastraAlimentoDominio(form,uriBuilder);
 	}
 
+	//colocar um perfil especifico que possa alterar (ADMIN)
 	@ApiOperation(value = "Atualiza um alimento de domínio se existir, caso contrário cadastra um novo")
 	@PutMapping("/update")
 	public ResponseEntity<?> atualizaAlimentoDominio(@RequestBody @Valid AlimentoDominioUpdateForm form, UriComponentsBuilder uri) {

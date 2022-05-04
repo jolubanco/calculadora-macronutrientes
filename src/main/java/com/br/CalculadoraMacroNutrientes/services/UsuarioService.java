@@ -41,12 +41,13 @@ public class UsuarioService {
 	private ExercicioRepository exercicioRepository;
 	
 	@Autowired
-	public UsuarioService(UsuarioRepository usuarioRepository,
+	public UsuarioService(
+			UsuarioRepository usuarioRepository,
 			InformacoesUsuarioRepository informacoesUsuarioRepository,
 			RefeicaoRepository refeicaoRepository,
 			DistribuicaoMacrosRepository distribuicaoMacrosRepository,
 			ExercicioRepository exercicioRepository
-			)
+	)
 	{
 		this.usuarioRepository = usuarioRepository;
 		this.informacoesUsuarioRepository = informacoesUsuarioRepository;
@@ -56,18 +57,17 @@ public class UsuarioService {
 	}
 	
 	public void calculaTaxaMetabolismoBasal(UsuarioModel usuario) {
-	
-			double altura = usuario.getInformacoesUsuario().getAltura();
-			double peso = usuario.getInformacoesUsuario().getPeso();
-			int idade = usuario.getInformacoesUsuario().getIdade();
-			
-			if (usuario.getInformacoesUsuario().getSexo().equals(SexoEnum.MASCULINO)) {
-				double tmbMasculino = 66 + ((13.7 * peso) + (5 * altura) - (6.8 * idade));			
-				usuario.getInformacoesUsuario().setTaxaMetabolismoBasal(Math.round(tmbMasculino));
-			} else if (usuario.getInformacoesUsuario().getSexo().equals(SexoEnum.FEMININO)) {
-				double tmbFeminino = 655 + ((9.6 * peso) + (1.8 * altura) - (4.7 * idade));			
-				usuario.getInformacoesUsuario().setTaxaMetabolismoBasal(Math.round(tmbFeminino));
-			}
+		double altura = usuario.getInformacoesUsuario().getAltura();
+		double peso = usuario.getInformacoesUsuario().getPeso();
+		int idade = usuario.getInformacoesUsuario().getIdade();
+
+		if (usuario.getInformacoesUsuario().getSexo().equals(SexoEnum.MASCULINO)) {
+			double tmbMasculino = 66 + ((13.7 * peso) + (5 * altura) - (6.8 * idade));
+			usuario.getInformacoesUsuario().setTaxaMetabolismoBasal(Math.round(tmbMasculino));
+		} else if (usuario.getInformacoesUsuario().getSexo().equals(SexoEnum.FEMININO)) {
+			double tmbFeminino = 655 + ((9.6 * peso) + (1.8 * altura) - (4.7 * idade));
+			usuario.getInformacoesUsuario().setTaxaMetabolismoBasal(Math.round(tmbFeminino));
+		}
 	}
 
 	public Page<UsuarioDto> listaUsuarios(Pageable paginacao) {
@@ -76,16 +76,11 @@ public class UsuarioService {
 	}
 	
 	public ResponseEntity<UsuarioDto> cadastraUsuario(UsuarioForm form, UriComponentsBuilder uriBuilder) {
-
 		UsuarioModel usuario = form.converter(informacoesUsuarioRepository);
-
 		calculandoDadosDoUsuario(usuario);
-
 		log.info("Cadastrando usuário");
 		usuarioRepository.save(usuario);
-		
         URI uri = uriBuilder.path("/usuarios/{id}").buildAndExpand(usuario.getId()).toUri();
-        
 		return ResponseEntity.created(uri).body(new UsuarioDto(usuario));
 	}
 
@@ -113,7 +108,6 @@ public class UsuarioService {
 	}
 
 	private void calculaDistribuicaoMacroNutrientes(UsuarioModel usuario) {
-
 		double caloriasLimite = usuario.getNecessidadeDiariaCalorias();
 		double proteina = 2 * usuario.getInformacoesUsuario().getPeso();
 		double gordura = 1 * usuario.getInformacoesUsuario().getPeso();
@@ -135,11 +129,12 @@ public class UsuarioService {
 
 			log.info("Adicionando refeição de id {}",idRefeicao);
 			usuario.getRefeicoes().add(refeicao);
+			log.info("Atualizando calorias restantes");
 			atualizaCaloriasRestantesPorRefeicao(usuario,refeicao);
-			//preciso atualizar os macros disponiveis
+			log.info("Atualizando os macros");
 			atualizaDistribuicaoDosMacros(usuario,refeicao);
 			usuarioRepository.save(usuario);
-			return ResponseEntity.ok().build();
+			return ResponseEntity.noContent().build();
 		} catch (UsuarioNaoEncontradoException | RefeicaoNaoEncontradoException e) {
 			log.error(e.getMessage());
 			return ResponseEntity.badRequest().body(e.getMessage());
@@ -153,7 +148,7 @@ public class UsuarioService {
 	}
 
 	private void atualizaCaloriasRestantesPorRefeicao(UsuarioModel usuario, RefeicaoModel refeicao) {
-		usuario.getDistribruicaoMacros().subtraiCaloriaConsumo(refeicao.getCaloriasTotais());
+		usuario.getDistribruicaoMacros().subtraiCaloriaDisponivel(refeicao.getCaloriasTotais());
 	}
 
 	public ResponseEntity<?> cadastraMacros(Long idUsuario,Long idMacros) {
@@ -166,7 +161,7 @@ public class UsuarioService {
 			log.info("Definindo distribuição de macros, de id {}, informada pelo usuário",idMacros);
 			usuario.setDistribruicaoMacros(distribuicaoMacros);
 			usuarioRepository.save(usuario);
-			return ResponseEntity.ok().build();
+			return ResponseEntity.noContent().build();
 		} catch (UsuarioNaoEncontradoException | DistribuicaoMacrosNaoEncontradoException e) {
 			log.error(e.getMessage());
 			return ResponseEntity.badRequest().body(e.getMessage());
@@ -181,8 +176,7 @@ public class UsuarioService {
 			return ResponseEntity.ok(new UsuarioDetalharDto(usuario));
 		} catch (UsuarioNaoEncontradoException e) {
 			log.error(e.getMessage());
-			//TROCAR PARA NOTFOUND
-			return ResponseEntity.badRequest().body(e.getMessage());
+			return ResponseEntity.notFound().build();
 		}
 	}
 
@@ -192,25 +186,33 @@ public class UsuarioService {
 					.orElseThrow(() -> new UsuarioNaoEncontradoException("Usuario de id " + idUsuario + " não encontrado"));
 			ExercicioModel exercicio = exercicioRepository.findById(idExercicio)
 					.orElseThrow(() -> new ExercicioNaoEncontradoException("Exercício de id " + idExercicio + " não encontrado"));
-			log.info("Cadastrando exercício de id {}",idExercicio);
-			usuario.getExercicios().add(exercicio);
-			atualizaCaloriasRestantesPorExercicio(usuario,exercicio);
-			atualizaCarboidratos(usuario,exercicio);
+
+			atualizandoInformacoesAPartirDoCadastroDoExercicio(idExercicio, usuario, exercicio);
 			usuarioRepository.save(usuario);
-			return ResponseEntity.ok().build();
+			return ResponseEntity.noContent().build();
 		} catch (UsuarioNaoEncontradoException | ExercicioNaoEncontradoException e) {
 			log.error(e.getMessage());
 			return ResponseEntity.badRequest().body(e.getMessage());
 		}
 	}
 
+	private void atualizandoInformacoesAPartirDoCadastroDoExercicio(Long idExercicio, UsuarioModel usuario, ExercicioModel exercicio) {
+		log.info("Cadastrando exercício de id {}", idExercicio);
+		usuario.getExercicios().add(exercicio);
+		log.info("Atualizando as calorias restantes");
+		atualizaCaloriasRestantesPorExercicio(usuario, exercicio);
+		log.info("Atualizando os macros");
+		atualizaCarboidratos(usuario, exercicio);
+	}
+	//calorias restantes
+	//carboidrato e carboidratodisponivel
+
 	private void atualizaCarboidratos(UsuarioModel usuario, ExercicioModel exercicio) {
-		usuario.getDistribruicaoMacros().adicionaCarboidrato(exercicio.getCaloriasGastas());
 		usuario.getDistribruicaoMacros().adicionaCarboidratoDisponivelAPartirDaCaloria(exercicio.getCaloriasGastas());
 	}
 
 	private void atualizaCaloriasRestantesPorExercicio(UsuarioModel usuario, ExercicioModel exercicio) {
-		usuario.getDistribruicaoMacros().adicionaCaloriaConsumo(exercicio.getCaloriasGastas());
+		usuario.getDistribruicaoMacros().adicionaCaloriaDisponivel(exercicio.getCaloriasGastas());
 	}
 	
 	private void calculaNecessidadeDiariaDeCalorias(UsuarioModel usuario) {
@@ -274,9 +276,20 @@ public class UsuarioService {
 		try {
 			UsuarioModel usuario = usuarioRepository.findById(idUsuario)
 					.orElseThrow(() -> new UsuarioNaoEncontradoException("Usuario de id " + idUsuario + " não encontrado"));
+
+			RefeicaoModel refeicaoASerRemovida = usuario.getRefeicoes()
+					.stream()
+					.filter(ref -> ref.getId().equals(idRefeicao))
+					.findFirst()
+					.orElseThrow(() -> new RefeicaoNaoEncontradoException("Refeição de id " + idRefeicao + " não encontrada"));
+
 			List<RefeicaoModel> refeicoes = usuario.getRefeicoes();
 			log.info("Removendo refeicão de id {}, caso exista",idRefeicao);
 			refeicoes.removeIf(refeicao -> refeicao.getId().equals(idRefeicao));
+
+			log.info("Atualizando informações do usuário");
+			atualizandoInformacoesAPartirDaRemocaoDaRefeicao(refeicaoASerRemovida,usuario);
+
 			usuarioRepository.save(usuario);
 			return ResponseEntity.noContent().build();
 		} catch (UsuarioNaoEncontradoException e) {
@@ -285,13 +298,32 @@ public class UsuarioService {
 		}
 	}
 
+	private void atualizandoInformacoesAPartirDaRemocaoDaRefeicao(RefeicaoModel refeicaoASerRemovida, UsuarioModel usuario) {
+		usuario.getDistribruicaoMacros().adicionaCaloriaDisponivel(refeicaoASerRemovida.getCaloriasTotais());
+		usuario.getDistribruicaoMacros().adicionaCarboidratoDisponivel(refeicaoASerRemovida.getCarboidratosTotais());
+		usuario.getDistribruicaoMacros().adicionaProteinaDisponivel(refeicaoASerRemovida.getProteinasTotais());
+		usuario.getDistribruicaoMacros().adicionaGorguraDisponivel(refeicaoASerRemovida.getGordurasTotais());
+	}
+
 	public ResponseEntity<?> removeExercicioDoUsuario(Long idUsuario, Long idExercicio) {
 		try {
 			UsuarioModel usuario = usuarioRepository.findById(idUsuario)
 					.orElseThrow(() -> new UsuarioNaoEncontradoException("Usuario de id " + idUsuario + " não encontrado"));
+
+			ExercicioModel exercicioASerExcluido = usuario.getExercicios()
+					.stream()
+					.filter(exer -> exer.getId().equals(idExercicio))
+					.findFirst()
+					.orElseThrow(() -> new ExercicioNaoEncontradoException("Exercicio de id " + idExercicio + " não encontrado"));
+
 			List<ExercicioModel> exercicios = usuario.getExercicios();
 			log.info("Removendo exercicio de id {}, caso exista",idExercicio);
 			exercicios.removeIf(exercicio -> exercicio.getId().equals(idExercicio));
+
+			//atualiza os macros
+			log.info("Atualizando informações do usuário");
+			atualizandoInformacoesAPartirDaRemocaoDoExercicio(exercicioASerExcluido,usuario);
+			//
 			usuarioRepository.save(usuario);
 			return ResponseEntity.noContent().build();
 		} catch (UsuarioNaoEncontradoException e) {
@@ -300,21 +332,26 @@ public class UsuarioService {
 		}
 	}
 
-    public ResponseEntity<?> atualizarPeso(Long idUsuario, double valorPeso) {
+	private void atualizandoInformacoesAPartirDaRemocaoDoExercicio(ExercicioModel exercicioASerExcluido, UsuarioModel usuario) {
+		usuario.getDistribruicaoMacros().subtraiCaloriaDisponivel(exercicioASerExcluido.getCaloriasGastas());
+		usuario.getDistribruicaoMacros().subtraiCarboidratoDisponivelAPartirDaCaloria(exercicioASerExcluido.getCaloriasGastas());
+	}
+
+	public ResponseEntity<?> atualizarPeso(Long idUsuario, double valorPeso) {
 		try{
 			UsuarioModel usuario = usuarioRepository.findById(idUsuario)
 					.orElseThrow(() -> new UsuarioNaoEncontradoException("Usuario de id " + idUsuario + " não encontrado"));
-			log.info("Recalculando as informações do usuário");
-			recalculandoDadosDoUsuario(usuario,valorPeso);
+			log.info("Recalculando as informações do usuário após atualização do peso");
+			recalculandoDadosDoUsuarioAposAtualizacaoDoPeso(usuario,valorPeso);
 			usuarioRepository.save(usuario);
-			return ResponseEntity.ok().build();
+			return ResponseEntity.noContent().build();
 		} catch (UsuarioNaoEncontradoException e) {
 			log.info(e.getMessage());
 			return ResponseEntity.notFound().build();
 		}
     }
 
-	private void recalculandoDadosDoUsuario(UsuarioModel usuario, double valorPeso) {
+	private void recalculandoDadosDoUsuarioAposAtualizacaoDoPeso(UsuarioModel usuario, double valorPeso) {
 		log.info("Atualizando o peso do usuário {} para {}",usuario.getId(),valorPeso);
 		atualizaPeso(usuario,valorPeso);
 		log.info("Recalculando a taxa de metabolismo basal");
@@ -329,6 +366,26 @@ public class UsuarioService {
 		redefineMacrosRestantes(usuario);
 	}
 
+	private void recalculandoDadosDoUsuarioAposAtualizacaoDoObjetivo(UsuarioModel usuario, String objetivo) {
+		log.info("Atualizando o objetivo do usuário {} para {}",usuario.getId(),objetivo);
+		String objetivoTratado = objetivo.toUpperCase();
+		usuario.setObjetivo(ObjetivoEnumModel.valueOf(objetivoTratado));
+
+		log.info("Recalculando a necessidade de calorias diárias");
+		calculaNecessidadeDiariaDeCalorias(usuario);
+
+		log.info("Recalculando distribuição dos macros nutrientes");
+		recalculaDistribuicaoDeCarboidrato(usuario);
+
+		log.info("Redefinindo as calorias disponíveis");
+		redefineCaloriasRestantes(usuario);
+		//problema está aqui ou na criação do usuario
+		log.info("Redefinindo distribuição dos macros disponíveis");
+		redefineCarboidratoRestantes(usuario);
+	}
+
+
+
 	private void atualizaPeso(UsuarioModel usuario, double valorPeso) {
 		usuario.getInformacoesUsuario().setPeso(valorPeso);
 	}
@@ -336,10 +393,25 @@ public class UsuarioService {
 	private void redefineCaloriasRestantes(UsuarioModel usuario) {
 		usuario.getDistribruicaoMacros().setConsumoCaloriasDisponivel(usuario.getNecessidadeDiariaCalorias());
 		List<ExercicioModel> exercicios = usuario.getExercicios();
-		exercicios.forEach(exercicio -> usuario.getDistribruicaoMacros().adicionaCaloriaConsumo(exercicio.getCaloriasGastas()));
+		exercicios.forEach(exercicio -> usuario.getDistribruicaoMacros().adicionaCaloriaDisponivel(exercicio.getCaloriasGastas()));
 
 		List<RefeicaoModel> refeicoes = usuario.getRefeicoes();
-		refeicoes.forEach(refeicao -> usuario.getDistribruicaoMacros().subtraiCaloriaConsumo(refeicao.getCaloriasTotais()));
+		refeicoes.forEach(refeicao -> usuario.getDistribruicaoMacros().subtraiCaloriaDisponivel(refeicao.getCaloriasTotais()));
+	}
+
+	private void redefineCarboidratoRestantes(UsuarioModel usuario) {
+
+		//ver a necessidade dessa parte
+		usuario.getDistribruicaoMacros().setCarboidratoDisponivel(usuario.getDistribruicaoMacros().getCarboidrato());
+		//
+
+		List<ExercicioModel> exercicios = usuario.getExercicios();
+		exercicios.forEach(exercicio -> usuario.getDistribruicaoMacros().adicionaCarboidratoDisponivelAPartirDaCaloria(exercicio.getCaloriasGastas()));
+
+		List<RefeicaoModel> refeicoes = usuario.getRefeicoes();
+		refeicoes.forEach(refeicao -> {
+			usuario.getDistribruicaoMacros().subtraiCarboidratoDisponivel(refeicao.getCarboidratosTotais());
+		});
 	}
 
 	private void redefineMacrosRestantes(UsuarioModel usuario) {
@@ -362,6 +434,13 @@ public class UsuarioService {
 	}
 
 
+	private void recalculaDistribuicaoDeCarboidrato(UsuarioModel usuario) {
+		double ndc = usuario.getNecessidadeDiariaCalorias();
+		double caloriasDisponiveis = ndc - (usuario.getDistribruicaoMacros().getProteina() * 4 + usuario.getDistribruicaoMacros().getGordura() * 9);
+		double carboidrato = Math.round(caloriasDisponiveis/4);
+		usuario.getDistribruicaoMacros().setCarboidrato(carboidrato);
+	}
+
 	private void recalculaDistribuicaoMacroNutrientes(UsuarioModel usuario) {
 
 		double ndc = usuario.getNecessidadeDiariaCalorias();
@@ -380,12 +459,10 @@ public class UsuarioService {
 		try {
 			UsuarioModel usuario = usuarioRepository.findById(idUsuario)
 					.orElseThrow(() -> new UsuarioNaoEncontradoException("Usuario de id " + idUsuario + " não encontrado"));
-			log.info("Atualizando o objetivo do usuário {} para {}",idUsuario,objetivo);
-			String objetivoTratado = objetivo.toUpperCase();
-			usuario.setObjetivo(ObjetivoEnumModel.valueOf(objetivoTratado));
-			log.info("Recalculando as informações do usuário");
-			calculandoDadosDoUsuario(usuario);
-			return ResponseEntity.ok().build();
+			log.info("Recalculando as informações do usuário após atualização do objetivo");
+			recalculandoDadosDoUsuarioAposAtualizacaoDoObjetivo(usuario,objetivo);
+			usuarioRepository.save(usuario);
+			return ResponseEntity.noContent().build();
 		} catch (UsuarioNaoEncontradoException e) {
 			log.info(e.getMessage());
 			return ResponseEntity.notFound().build();

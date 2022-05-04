@@ -65,7 +65,8 @@ public class UsuarioController {
 	public ResponseEntity<?> removeRefeicaoDoUsuario(@PathVariable("idUsuario") Long idUsuario, @PathVariable("idRefeicao") Long idRefeicao){
 		return usuarioService.removeRefeicaoDoUsuario(idUsuario,idRefeicao);
 	}
-	
+
+	//rever
 	@ApiOperation(value = "Associa os macronutrientes informados pelo usuário a partir da lista já cadastrada")
 	@PatchMapping("/{idUsuario}/add/macros/{idMacros}")
 	public ResponseEntity<?> cadastraMacros(@PathVariable("idUsuario") Long idUsuario,@PathVariable("idMacros") Long idMacros){

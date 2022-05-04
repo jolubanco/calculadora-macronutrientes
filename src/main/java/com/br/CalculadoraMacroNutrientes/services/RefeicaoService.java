@@ -57,9 +57,11 @@ public class RefeicaoService {
 
 			log.info("Adicionando alimento na refeição");
 			refeicao.getAlimentos().add(alimento);
+			log.info("Recalculando os macrosnutrientes da refeição");
 			adicionaMacrosDaRefeicao(refeicao,alimento);
 
 			if(idUsuario != null) {
+				log.info("Recalculando a distribuição dos macrosnutrientes do usuário");
 				subtraiMacrosDisponiveisDoUsuario(idUsuario,alimento);
 			}
 			return ResponseEntity.ok(new RefeicaoDto(refeicao));
@@ -76,7 +78,7 @@ public class RefeicaoService {
 					.orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário de id " + idUsuario + " não encontrado"));
 			log.info("Atualizando os macros disponíveis do usuário após a remoção de um alimento");
 
-			usuario.getDistribruicaoMacros().adicionaCaloriaConsumo(alimento.getCalorias());
+			usuario.getDistribruicaoMacros().adicionaCaloriaDisponivel(alimento.getCalorias());
 			usuario.getDistribruicaoMacros().adicionaCarboidratoDisponivel(alimento.getCarboidrato());
 			usuario.getDistribruicaoMacros().adicionaProteinaDisponivel(alimento.getProteina());
 			usuario.getDistribruicaoMacros().adicionaGorguraDisponivel(alimento.getGordura());
@@ -94,7 +96,7 @@ public class RefeicaoService {
 					.orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário de id " + idUsuario + " não encontrado"));
 			log.info("Atualizando os macros disponíveis do usuário após a inserção de um alimento");
 
-			usuario.getDistribruicaoMacros().subtraiCaloriaConsumo(alimento.getCalorias());
+			usuario.getDistribruicaoMacros().subtraiCaloriaDisponivel(alimento.getCalorias());
 			usuario.getDistribruicaoMacros().subtraiCarboidratoDisponivel(alimento.getCarboidrato());
 			usuario.getDistribruicaoMacros().subtraiProteinaDisponivel(alimento.getProteina());
 			usuario.getDistribruicaoMacros().subtraiGorduraDisponivel(alimento.getGordura());
@@ -153,9 +155,11 @@ public class RefeicaoService {
 			log.info("Removendo alimento de id {}, caso exista",idAlimento);
 			alimentos.removeIf(alimentoASerRemovido -> alimentoASerRemovido.getId().equals(idAlimento));
 
+			log.info("Recalculando os macrosnutrientes da refeição");
 			subtraiMacrosDaRefeicao(refeicao,alimento);
 
 			if(idUsuario != null) {
+				log.info("Recalculando a distribuição dos macrosnutrientes do usuário");
 				adicionaMacrosDisponiveisDoUsuario(idUsuario,alimento);
 			}
 
