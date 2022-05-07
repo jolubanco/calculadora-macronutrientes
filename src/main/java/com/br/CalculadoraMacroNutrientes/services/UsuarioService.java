@@ -8,9 +8,11 @@ import com.br.CalculadoraMacroNutrientes.exceptions.DistribuicaoMacrosNaoEncontr
 import com.br.CalculadoraMacroNutrientes.exceptions.ExercicioNaoEncontradoException;
 import com.br.CalculadoraMacroNutrientes.exceptions.RefeicaoNaoEncontradoException;
 import com.br.CalculadoraMacroNutrientes.exceptions.UsuarioNaoEncontradoException;
+import com.br.CalculadoraMacroNutrientes.history.HistoricoPeso;
 import com.br.CalculadoraMacroNutrientes.models.*;
 import com.br.CalculadoraMacroNutrientes.models.enums.ObjetivoEnumModel;
 import com.br.CalculadoraMacroNutrientes.models.enums.SexoEnum;
+import com.br.CalculadoraMacroNutrientes.repositories.*;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,11 +25,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.br.CalculadoraMacroNutrientes.controllers.dtos.UsuarioDetalharDto;
 import com.br.CalculadoraMacroNutrientes.controllers.dtos.UsuarioDto;
 import com.br.CalculadoraMacroNutrientes.controllers.forms.UsuarioForm;
-import com.br.CalculadoraMacroNutrientes.repositories.DistribuicaoMacrosRepository;
-import com.br.CalculadoraMacroNutrientes.repositories.ExercicioRepository;
-import com.br.CalculadoraMacroNutrientes.repositories.InformacoesUsuarioRepository;
-import com.br.CalculadoraMacroNutrientes.repositories.RefeicaoRepository;
-import com.br.CalculadoraMacroNutrientes.repositories.UsuarioRepository;
 
 @Slf4j
 @NoArgsConstructor
@@ -39,6 +36,8 @@ public class UsuarioService {
 	private RefeicaoRepository refeicaoRepository; 
 	private DistribuicaoMacrosRepository distribuicaoMacrosRepository;
 	private ExercicioRepository exercicioRepository;
+
+	private HistoricoPesoRepository historicoPesoRepository;
 	
 	@Autowired
 	public UsuarioService(
@@ -46,7 +45,8 @@ public class UsuarioService {
 			InformacoesUsuarioRepository informacoesUsuarioRepository,
 			RefeicaoRepository refeicaoRepository,
 			DistribuicaoMacrosRepository distribuicaoMacrosRepository,
-			ExercicioRepository exercicioRepository
+			ExercicioRepository exercicioRepository,
+			HistoricoPesoRepository historicoPesoRepository
 	)
 	{
 		this.usuarioRepository = usuarioRepository;
@@ -54,6 +54,7 @@ public class UsuarioService {
 		this.refeicaoRepository = refeicaoRepository;
 		this.distribuicaoMacrosRepository = distribuicaoMacrosRepository;
 		this.exercicioRepository = exercicioRepository;
+		this.historicoPesoRepository = historicoPesoRepository;
 	}
 	
 	public void calculaTaxaMetabolismoBasal(UsuarioModel usuario) {
@@ -80,6 +81,14 @@ public class UsuarioService {
 		calculandoDadosDoUsuario(usuario);
 		log.info("Cadastrando usuário");
 		usuarioRepository.save(usuario);
+
+		log.info("Atualizando a tabela de histórico de peso");
+		HistoricoPeso historicoPeso = HistoricoPeso.builder()
+				.peso(usuario.getInformacoesUsuario().getPeso())
+				.idUsuario(usuario.getId())
+				.build();
+		historicoPesoRepository.save(historicoPeso);
+
         URI uri = uriBuilder.path("/usuarios/{id}").buildAndExpand(usuario.getId()).toUri();
 		return ResponseEntity.created(uri).body(new UsuarioDto(usuario));
 	}
@@ -273,6 +282,14 @@ public class UsuarioService {
 
 			//
 			usuarioRepository.save(usuarioConvertido);
+
+			log.info("Atualizando a tabela de histórico de peso");
+			HistoricoPeso historicoPeso = HistoricoPeso.builder()
+					.peso(usuarioConvertido.getInformacoesUsuario().getPeso())
+					.idUsuario(usuarioConvertido.getId())
+					.build();
+			historicoPesoRepository.save(historicoPeso);
+
 			return ResponseEntity.noContent().build();
 		} catch (UsuarioNaoEncontradoException e) {
 			log.error(e.getMessage());
@@ -367,6 +384,14 @@ public class UsuarioService {
 			log.info("Recalculando as informações do usuário após atualização do peso");
 			recalculandoDadosDoUsuarioAposAtualizacaoDoPeso(usuario,valorPeso);
 			usuarioRepository.save(usuario);
+
+			log.info("Atualizando a tabela de histórico de peso");
+			HistoricoPeso historicoPeso = HistoricoPeso.builder()
+					.peso(usuario.getInformacoesUsuario().getPeso())
+					.idUsuario(usuario.getId())
+					.build();
+			historicoPesoRepository.save(historicoPeso);
+
 			return ResponseEntity.noContent().build();
 		} catch (UsuarioNaoEncontradoException e) {
 			log.info(e.getMessage());
