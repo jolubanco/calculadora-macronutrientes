@@ -49,19 +49,19 @@ public class RefeicaoModel {
     }
 
 	//refatorar o nome dos métos para adicionaCarboidratosTotais
-    public void adicionaCarboidratos(double carboidrato) {
+    public void adicionaCarboidratosTotais(double carboidrato) {
 		this.carboidratosTotais += carboidrato;
 	}
 	
-	public void adicionaProteinas(double proteina) {
+	public void adicionaProteinasTotais(double proteina) {
 		this.proteinasTotais += proteina;
 	}
 	
-	public void adicionaGorduras(double gordura) {
+	public void adicionaGordurasTotais(double gordura) {
 		this.gordurasTotais += gordura;
 	}
 	
-	public void adicionaCalorias(double caloria) {
+	public void adicionaCaloriasTotais(double caloria) {
 		this.caloriasTotais += caloria;
 	}
 	//

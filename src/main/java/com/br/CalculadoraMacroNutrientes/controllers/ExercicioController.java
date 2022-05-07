@@ -41,10 +41,10 @@ public class ExercicioController {
 	public ResponseEntity<?> cadastraExercicio(@RequestBody @Valid ExercicioForm form, UriComponentsBuilder uriBuilder){
 		return exercicioService.cadastraExercicio(form,uriBuilder);
 	}
-	@ApiOperation(value = "Atualiza um exercício existente")
+	@ApiOperation(value = "Atualiza um exercício existente, caso o parâmetro idUsuario seja informado atualiza as informações de macros do usuário")
 	@PutMapping("/update")
-	public ResponseEntity<?> atualizaExercicio(@RequestBody @Valid ExercicioUpdateForm form, UriComponentsBuilder uri){
-		return exercicioService.atualizarExercicio(form,uri);
+	public ResponseEntity<?> atualizaExercicio(@RequestBody @Valid ExercicioUpdateForm form, Long idUsuario){
+		return exercicioService.atualizarExercicio(form,idUsuario);
 	}
 	@ApiOperation(value = "Deleta um exercício")
 	@DeleteMapping("/delete/{idExercicio}")

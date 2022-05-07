@@ -26,7 +26,7 @@ public class DistribuicaoMacrosService {
 		this.distribuicaoMacrosRepository = distribuicaoMacrosRepository;
 	}
 
-	public ResponseEntity<DistribuicaoMacrosDto> defineMacrosUsuario(MacrosForm form, UriComponentsBuilder uriBuilder) {
+	public ResponseEntity<DistribuicaoMacrosDto> cadastraMacrosUsuario(MacrosForm form, UriComponentsBuilder uriBuilder) {
 		DistribuicaoMacrosModel distruicaoMacros = form.converter();
 		distribuicaoMacrosRepository.save(distruicaoMacros);
 		URI uri = uriBuilder.path("/macros/{id}").buildAndExpand(distruicaoMacros.getId()).toUri();
@@ -39,11 +39,15 @@ public class DistribuicaoMacrosService {
 					.orElseThrow(() -> new DistribuicaoMacrosNaoEncontradoException("Distribuição de macros de id " + form.getId() + " não encontrada"));
 			DistribuicaoMacrosModel dist = form.converter();
 			log.info("Atualizando distribuição de macros de id {}",form.getId());
+
+			//recalcular toda a distribuicao de calorias
+
+			//
 			distribuicaoMacrosRepository.save(dist);
 			return ResponseEntity.noContent().build();
 		} catch (DistribuicaoMacrosNaoEncontradoException e) {
 			log.error(e.getMessage());
-			return ResponseEntity.badRequest().body(e.getMessage());
+			return ResponseEntity.notFound().build();
 		}
 	}
 }

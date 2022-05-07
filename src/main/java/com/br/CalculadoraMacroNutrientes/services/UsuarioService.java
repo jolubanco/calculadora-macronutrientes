@@ -131,7 +131,7 @@ public class UsuarioService {
 			usuario.getRefeicoes().add(refeicao);
 			log.info("Atualizando calorias restantes");
 			atualizaCaloriasRestantesPorRefeicao(usuario,refeicao);
-			log.info("Atualizando os macros");
+			log.info("Atualizando os macros disponíveis");
 			atualizaDistribuicaoDosMacros(usuario,refeicao);
 			usuarioRepository.save(usuario);
 			return ResponseEntity.noContent().build();
@@ -155,17 +155,37 @@ public class UsuarioService {
 		try {
 			UsuarioModel usuario = usuarioRepository.findById(idUsuario)
 					.orElseThrow(() -> new UsuarioNaoEncontradoException("Usuario de id " + idUsuario + " não encontrado"));
-			DistribuicaoMacrosModel distribuicaoMacros = distribuicaoMacrosRepository.findById(idMacros)
+			DistribuicaoMacrosModel distribuicaoMacrosAtualizada = distribuicaoMacrosRepository.findById(idMacros)
 					.orElseThrow(() -> new DistribuicaoMacrosNaoEncontradoException("Distribuição de macros, de id " + idMacros + " não encontrada"));
-
 			log.info("Definindo distribuição de macros, de id {}, informada pelo usuário",idMacros);
-			usuario.setDistribruicaoMacros(distribuicaoMacros);
+			usuario.setDistribruicaoMacros(distribuicaoMacrosAtualizada);
+			log.info("Calculando os macros disponíveis");
+			calculaMacrosRestantesAPartirDosMacrosDefinidos(usuario);
 			usuarioRepository.save(usuario);
 			return ResponseEntity.noContent().build();
 		} catch (UsuarioNaoEncontradoException | DistribuicaoMacrosNaoEncontradoException e) {
 			log.error(e.getMessage());
-			return ResponseEntity.badRequest().body(e.getMessage());
+			return ResponseEntity.notFound().build();
 		}
+	}
+
+	private void calculaMacrosRestantesAPartirDosMacrosDefinidos(UsuarioModel usuario) {
+		double consumoCaloriasDisponiveis = 4 * usuario.getDistribruicaoMacros().getCarboidrato()
+				+ 4 * usuario.getDistribruicaoMacros().getProteina()
+				+ 9 * usuario.getDistribruicaoMacros().getGordura();
+		usuario.getDistribruicaoMacros().setConsumoCaloriasDisponivel(consumoCaloriasDisponiveis);
+		usuario.getRefeicoes().forEach(refeicao -> {
+			log.info("Atualizando calorias restantes");
+			atualizaCaloriasRestantesPorRefeicao(usuario,refeicao);
+			log.info("Atualizando os macros disponíveis");
+			atualizaDistribuicaoDosMacros(usuario,refeicao);
+		});
+		usuario.getExercicios().forEach(exercicio -> {
+			log.info("Atualizando as calorias restantes");
+			atualizaCaloriasRestantesPorExercicio(usuario, exercicio);
+			log.info("Atualizando os macros");
+			atualizaCarboidratos(usuario, exercicio);
+		});
 	}
 
 	public ResponseEntity<?> detalhaUsuario(Long idUsuario) {
@@ -208,7 +228,7 @@ public class UsuarioService {
 	//carboidrato e carboidratodisponivel
 
 	private void atualizaCarboidratos(UsuarioModel usuario, ExercicioModel exercicio) {
-		usuario.getDistribruicaoMacros().adicionaCarboidratoDisponivelAPartirDaCaloria(exercicio.getCaloriasGastas());
+		usuario.getDistribruicaoMacros().adicionaCarboidratosDisponivelAPartirDaCaloria(exercicio.getCaloriasGastas());
 	}
 
 	private void atualizaCaloriasRestantesPorExercicio(UsuarioModel usuario, ExercicioModel exercicio) {
@@ -249,6 +269,9 @@ public class UsuarioService {
 					.orElseThrow(() -> new UsuarioNaoEncontradoException("Usuario de id " + form.getId() + " não encontrado"));
 			UsuarioModel usuarioConvertido = cadastraDadosUsuarioQueEstaSendoAtualizado(form, usuario);
 			log.info("Atualizando usuário de id {}",usuario.getId());
+			// atualizar as informações do usuario (mais complexo)
+
+			//
 			usuarioRepository.save(usuarioConvertido);
 			return ResponseEntity.noContent().build();
 		} catch (UsuarioNaoEncontradoException e) {
@@ -334,7 +357,7 @@ public class UsuarioService {
 
 	private void atualizandoInformacoesAPartirDaRemocaoDoExercicio(ExercicioModel exercicioASerExcluido, UsuarioModel usuario) {
 		usuario.getDistribruicaoMacros().subtraiCaloriaDisponivel(exercicioASerExcluido.getCaloriasGastas());
-		usuario.getDistribruicaoMacros().subtraiCarboidratoDisponivelAPartirDaCaloria(exercicioASerExcluido.getCaloriasGastas());
+		usuario.getDistribruicaoMacros().subtraiCarboidratosDisponivelAPartirDaCaloria(exercicioASerExcluido.getCaloriasGastas());
 	}
 
 	public ResponseEntity<?> atualizarPeso(Long idUsuario, double valorPeso) {
@@ -406,7 +429,7 @@ public class UsuarioService {
 		//
 
 		List<ExercicioModel> exercicios = usuario.getExercicios();
-		exercicios.forEach(exercicio -> usuario.getDistribruicaoMacros().adicionaCarboidratoDisponivelAPartirDaCaloria(exercicio.getCaloriasGastas()));
+		exercicios.forEach(exercicio -> usuario.getDistribruicaoMacros().adicionaCarboidratosDisponivelAPartirDaCaloria(exercicio.getCaloriasGastas()));
 
 		List<RefeicaoModel> refeicoes = usuario.getRefeicoes();
 		refeicoes.forEach(refeicao -> {
@@ -423,7 +446,7 @@ public class UsuarioService {
 		//
 
 		List<ExercicioModel> exercicios = usuario.getExercicios();
-		exercicios.forEach(exercicio -> usuario.getDistribruicaoMacros().adicionaCarboidratoDisponivelAPartirDaCaloria(exercicio.getCaloriasGastas()));
+		exercicios.forEach(exercicio -> usuario.getDistribruicaoMacros().adicionaCarboidratosDisponivelAPartirDaCaloria(exercicio.getCaloriasGastas()));
 
 		List<RefeicaoModel> refeicoes = usuario.getRefeicoes();
 		refeicoes.forEach(refeicao -> {
@@ -465,6 +488,21 @@ public class UsuarioService {
 			return ResponseEntity.noContent().build();
 		} catch (UsuarioNaoEncontradoException e) {
 			log.info(e.getMessage());
+			return ResponseEntity.notFound().build();
+		}
+	}
+
+	public ResponseEntity<?> resetaMacros(Long idUsuario) {
+		try{
+			UsuarioModel usuario = usuarioRepository.findById(idUsuario)
+					.orElseThrow(() -> new UsuarioNaoEncontradoException("Usuario de id " + idUsuario + " não encontrado"));
+			log.info("Recalculando as informações do usuario de id {}",usuario.getId());
+			//rever, porque está setando os valores sem levar em consideração as refeicoes e exercicios existentes
+			calculandoDadosDoUsuario(usuario);
+			usuarioRepository.save(usuario);
+			return ResponseEntity.noContent().build();
+		} catch (UsuarioNaoEncontradoException e) {
+			log.error(e.getMessage());
 			return ResponseEntity.notFound().build();
 		}
 	}

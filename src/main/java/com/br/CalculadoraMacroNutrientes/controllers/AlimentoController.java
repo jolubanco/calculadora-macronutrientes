@@ -44,10 +44,10 @@ public class AlimentoController {
 		return alimentoService.cadastraAlimento(form, uriBuilder);
 	}
 
-	@ApiOperation(value = "Atualiza um alimento")
+	@ApiOperation(value = "Atualiza um alimento, caso sejam passados os parametros idUsuario e idRefeicao atualiza a distribuição de macros nos respectivos")
 	@PutMapping("/update")
-	public ResponseEntity<?> atualizaAlimento(@RequestBody @Valid AlimentoUpdateForm form){
-		return alimentoService.atualizaAlimento(form);
+	public ResponseEntity<?> atualizaAlimento(@RequestBody @Valid AlimentoUpdateForm form,Long idUsuario,Long idRefeicao){
+		return alimentoService.atualizaAlimento(form,idUsuario,idRefeicao);
 	}
 
 	@ApiOperation(value = "Deleta um alimento")

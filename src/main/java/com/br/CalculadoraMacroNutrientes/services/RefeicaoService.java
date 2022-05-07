@@ -109,10 +109,10 @@ public class RefeicaoService {
 	}
 
 	private void adicionaMacrosDaRefeicao(RefeicaoModel refeicao, AlimentoModel alimento) {
-		refeicao.adicionaCarboidratos(alimento.getCarboidrato());
-		refeicao.adicionaCalorias(alimento.getCalorias());
-		refeicao.adicionaProteinas(alimento.getProteina());
-		refeicao.adicionaGorduras(alimento.getGordura());
+		refeicao.adicionaCarboidratosTotais(alimento.getCarboidrato());
+		refeicao.adicionaCaloriasTotais(alimento.getCalorias());
+		refeicao.adicionaProteinasTotais(alimento.getProteina());
+		refeicao.adicionaGordurasTotais(alimento.getGordura());
 		refeicaoRepository.save(refeicao);
 	}
 

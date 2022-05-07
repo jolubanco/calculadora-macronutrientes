@@ -11,11 +11,11 @@ import lombok.Getter;
 @Getter
 public class MacrosForm {
 	
-	@NotNull @Length(min = 1,max = 4)
+	@NotNull //@Length(min = 1,max = 4)
 	private double carboidrato;
-	@NotNull @Length(min = 1,max = 4)
+	@NotNull //@Length(min = 1,max = 4)
 	private double proteina;
-	@NotNull @Length(min = 1,max = 4)
+	@NotNull //@Length(min = 1,max = 4)
 	private double gordura;
 
 	public DistribuicaoMacrosModel converter() {

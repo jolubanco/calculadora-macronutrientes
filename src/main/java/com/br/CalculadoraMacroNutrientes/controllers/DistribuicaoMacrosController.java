@@ -23,8 +23,8 @@ public class DistribuicaoMacrosController {
 
 	@ApiOperation(value = "Define os macronutrientes informados pelo usuário")
 	@PostMapping("/set")
-	public ResponseEntity<DistribuicaoMacrosDto> defineMacrosUsuario(@RequestBody @Valid MacrosForm form, UriComponentsBuilder uriBuilder) {
-		return distribuicaoMacrosService.defineMacrosUsuario(form,uriBuilder);
+	public ResponseEntity<DistribuicaoMacrosDto> cadastraMacrosUsuario(@RequestBody @Valid MacrosForm form, UriComponentsBuilder uriBuilder) {
+		return distribuicaoMacrosService.cadastraMacrosUsuario(form,uriBuilder);
 	}
 	@ApiOperation(value = "Atualiza os macronutrientes informados pelo usuário")
 	@PutMapping("/update")

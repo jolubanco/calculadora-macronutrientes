@@ -14,9 +14,9 @@ import javax.validation.constraints.NotNull;
 @Getter
 public class ExercicioUpdateForm {
 	
-	@NotNull @NotBlank @Length(min = 1,max = 2)
+	@NotNull //@NotBlank //@Length(min = 1,max = 2)
 	private Long id;
-	@NotNull @Length(min = 2,max = 4)
+	@NotNull //@Length(min = 2,max = 4)
 	private double tempo;
 	@NotNull @NotBlank
 	private String modalidade;

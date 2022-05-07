@@ -73,6 +73,12 @@ public class UsuarioController {
 		return usuarioService.cadastraMacros(idUsuario,idMacros);
 	}
 
+	@ApiOperation("Reseta os macros do usuário para que seja calculada a distribuição automaticamente")
+	@PatchMapping("/{idUsuario}/reset/macros")
+	public ResponseEntity<?> resetaMacros(@PathVariable("idUsuario") Long idUsuario){
+		return usuarioService.resetaMacros(idUsuario);
+	}
+
 	@ApiOperation(value = "Associa um exercício ao usuário a partir da lista já cadastrada")
 	@PatchMapping("/{idUsuario}/add/exercicio/{idExercicio}")
 	public ResponseEntity<?> cadastraExercicio(@PathVariable("idUsuario") Long idUsuario, @PathVariable("idExercicio") Long idExercicio){

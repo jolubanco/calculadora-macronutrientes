@@ -2,12 +2,12 @@ package com.br.CalculadoraMacroNutrientes.services;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Optional;
 
 import com.br.CalculadoraMacroNutrientes.controllers.forms.ExercicioUpdateForm;
 import com.br.CalculadoraMacroNutrientes.exceptions.ExercicioNaoEncontradoException;
-import com.br.CalculadoraMacroNutrientes.exceptions.RefeicaoNaoEncontradoException;
-import io.swagger.models.Response;
+import com.br.CalculadoraMacroNutrientes.exceptions.UsuarioNaoEncontradoException;
+import com.br.CalculadoraMacroNutrientes.models.UsuarioModel;
+import com.br.CalculadoraMacroNutrientes.repositories.UsuarioRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -28,11 +28,14 @@ public class ExercicioService {
 	
 	private ExercicioDominioRepository exercicioDominioRepository;
 	private ExercicioRepository exercicioRepository;
+
+	private UsuarioRepository usuarioRepository;
 	
 	@Autowired
-	public ExercicioService (ExercicioDominioRepository exercicioDominioRepository,ExercicioRepository exercicioRepository) {
+	public ExercicioService (ExercicioDominioRepository exercicioDominioRepository,ExercicioRepository exercicioRepository, UsuarioRepository usuarioRepository) {
 		this.exercicioDominioRepository = exercicioDominioRepository;
 		this.exercicioRepository = exercicioRepository;
+		this.usuarioRepository = usuarioRepository;
 	}
 	
 	public ExercicioModel calcularCaloriasExercicio(Long idExercicio, double tempoExecucao) {
@@ -93,12 +96,23 @@ public class ExercicioService {
 		}
 	}
 
-	public ResponseEntity<?> atualizarExercicio(ExercicioUpdateForm form, UriComponentsBuilder uri) {
+	public ResponseEntity<?> atualizarExercicio(ExercicioUpdateForm form, Long idUsuario) {
 		try {
 			exercicioRepository.findById(form.getId())
 					.orElseThrow(() -> new ExercicioNaoEncontradoException("Exercício de id " + form.getId() + " não encontrado"));
 
 			ExercicioModel exercicio = form.converter();
+
+			if(idUsuario != null) {
+				try {
+					log.info("Recalculando a distribuição dos macrosnutrientes do usuário");
+					atualizarMacrosDoUsuarioAPartirDaAtualizacaoDoExercicio(idUsuario,exercicio);
+				} catch (UsuarioNaoEncontradoException e) {
+					log.error(e.getMessage());
+					return ResponseEntity.notFound().build();
+				}
+			}
+
 			log.info("Atualizando exercicio de id {}",form.getId());
 			exercicioRepository.save(exercicio);
 			return ResponseEntity.noContent().build();
@@ -106,5 +120,20 @@ public class ExercicioService {
 			log.error(e.getMessage());
 			return ResponseEntity.badRequest().body(e.getMessage());
 		}
+	}
+
+	private void atualizarMacrosDoUsuarioAPartirDaAtualizacaoDoExercicio(Long idUsuario, ExercicioModel exercicio) {
+		UsuarioModel usuario = usuarioRepository.findById(idUsuario)
+				.orElseThrow(() -> new UsuarioNaoEncontradoException("Usuario de id " + idUsuario + " não encontrado"));
+		ExercicioModel exercicioAntesDoUpdate = exercicioRepository.findById(exercicio.getId())
+				.orElseThrow(() -> new ExercicioNaoEncontradoException("Exercicio de id " + exercicio.getId() + " não encontrado"));
+		log.info("Atualizando carboidratos");
+		//subtrai os dados do exercicio antigo
+		usuario.getDistribruicaoMacros().subtraiCarboidratosDisponivelAPartirDaCaloria(exercicioAntesDoUpdate.getCaloriasGastas());
+		usuario.getDistribruicaoMacros().subtraiCaloriaDisponivel(exercicioAntesDoUpdate.getCaloriasGastas());
+		//adiciona os dados do exercicio novo
+		usuario.getDistribruicaoMacros().adicionaCarboidratosDisponivelAPartirDaCaloria(exercicio.getCaloriasGastas());
+		usuario.getDistribruicaoMacros().adicionaCaloriaDisponivel(exercicio.getCaloriasGastas());
+		usuarioRepository.save(usuario);
 	}
 }

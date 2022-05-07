@@ -46,11 +46,11 @@ public class DistribuicaoMacrosModel {
 	}
 	
 	public void adicionaCaloriaDisponivel(double caloria) {
-		consumoCaloriasDisponivel += caloria;
+		this.consumoCaloriasDisponivel += caloria;
 	}
 
 	public void subtraiCaloriaDisponivel(double calorias) {
-		consumoCaloriasDisponivel -= calorias;
+		this.consumoCaloriasDisponivel -= calorias;
 	}
 
 	public void subtraiCarboidratoDisponivel(double carboidratos) {
@@ -65,22 +65,14 @@ public class DistribuicaoMacrosModel {
 		this.gorduraDisponivel -= gorduras;
 	}
 
-	public void adicionaCarboidratoAtravesDasCalorias(double caloriasGastas) {
+	public void adicionaCarboidratosDisponivelAPartirDaCaloria(double caloriasGastas) {
+		this.carboidratoDisponivel += caloriasGastas/4;
 		this.carboidrato += caloriasGastas/4;
 	}
 
-	public void subtraiCarboidratoAtravesDasCalorias(double caloriasGastas) {
-		this.carboidrato -= caloriasGastas/4;
-	}
-
-	public void adicionaCarboidratoDisponivelAPartirDaCaloria(double caloriasGastas) {
-		this.carboidratoDisponivel += caloriasGastas/4;
-		adicionaCarboidratoAtravesDasCalorias(caloriasGastas);
-	}
-
-	public void subtraiCarboidratoDisponivelAPartirDaCaloria(double caloriasGastas) {
+	public void subtraiCarboidratosDisponivelAPartirDaCaloria(double caloriasGastas) {
 		this.carboidratoDisponivel -= caloriasGastas/4;
-		subtraiCarboidratoAtravesDasCalorias(caloriasGastas);
+		this.carboidrato -= caloriasGastas/4;
 	}
 
 	public void adicionaCarboidratoDisponivel(double carboidrato) {
