@@ -61,7 +61,7 @@ public class ExercicioService {
 	        return ResponseEntity.created(uri).body(new ExercicioDto(exercicio));
 		} catch(Exception e) {
 			log.error(e.getMessage());
-			return ResponseEntity.badRequest().body(e.getMessage());
+			return ResponseEntity.notFound().build();
 		}
 	}
 
@@ -73,7 +73,7 @@ public class ExercicioService {
 			return ResponseEntity.ok(new ExercicioDetalharDto(exercicio));
 		} catch (ExercicioNaoEncontradoException e) {
 			log.error(e.getMessage());
-			return ResponseEntity.badRequest().body(e.getMessage());
+			return ResponseEntity.notFound().build();
 		}
 
 	}
@@ -92,7 +92,7 @@ public class ExercicioService {
 			return ResponseEntity.noContent().build();
 		} catch(ExercicioNaoEncontradoException e){
 			log.error(e.getMessage());
-			return ResponseEntity.badRequest().body(e.getMessage());
+			return ResponseEntity.notFound().build();
 		}
 	}
 
@@ -118,7 +118,7 @@ public class ExercicioService {
 			return ResponseEntity.noContent().build();
 		} catch (ExercicioNaoEncontradoException e) {
 			log.error(e.getMessage());
-			return ResponseEntity.badRequest().body(e.getMessage());
+			return ResponseEntity.notFound().build();
 		}
 	}
 

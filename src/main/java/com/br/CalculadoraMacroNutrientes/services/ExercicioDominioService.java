@@ -42,7 +42,7 @@ public class ExercicioDominioService {
 			return ResponseEntity.ok(new ExercicioDominioDetalharDto(exercicio));
 		} catch (ExercicioNaoEncontradoException e) {
 			log.error(e.getMessage());
-			return ResponseEntity.badRequest().body(e.getMessage());
+			return ResponseEntity.notFound().build();
 		}
 
 	}
@@ -83,7 +83,7 @@ public class ExercicioDominioService {
 			return ResponseEntity.noContent().build();
 		} catch (ExercicioNaoEncontradoException e) {
 			log.error(e.getMessage());
-			return ResponseEntity.badRequest().body(e.getMessage());
+			return ResponseEntity.notFound().build();
 		}
 
 	}

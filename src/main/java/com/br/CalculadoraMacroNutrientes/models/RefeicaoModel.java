@@ -1,6 +1,7 @@
 package com.br.CalculadoraMacroNutrientes.models;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,10 +29,11 @@ public class RefeicaoModel {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	private String nome;
-	private double caloriasTotais = 0;
-	private double proteinasTotais = 0;
-	private double carboidratosTotais = 0;
-	private double gordurasTotais = 0;
+	//private LocalDateTime horário;
+	private double caloriasTotais;
+	private double proteinasTotais;
+	private double carboidratosTotais;
+	private double gordurasTotais;
 	private LocalDate dataCriacao = LocalDate.now();
 	@ManyToMany
 	@JoinTable(name = "refeicoes_alimentos",

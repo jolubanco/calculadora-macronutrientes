@@ -47,7 +47,7 @@ public class AlimentoDominioService {
 			return ResponseEntity.ok(new AlimentoDominioDetalharDto(alimentoDominio));
 		} catch (AlimentoNaoEncontradoException e) {
 			log.error(e.getMessage());
-			return ResponseEntity.badRequest().body(e.getMessage());
+			return ResponseEntity.notFound().build();
 		}
 
 	}
@@ -73,7 +73,7 @@ public class AlimentoDominioService {
 			return ResponseEntity.noContent().build();
 		} catch (AlimentoNaoEncontradoException e){
 			log.error(e.getMessage());
-			return ResponseEntity.badRequest().body(e.getMessage());
+			return ResponseEntity.notFound().build();
 		}
     }
 

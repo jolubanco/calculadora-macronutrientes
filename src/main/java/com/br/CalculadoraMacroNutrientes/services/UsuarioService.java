@@ -256,9 +256,9 @@ public class UsuarioService {
 		double ndc = basal * usuario.getInformacoesUsuario().getFatorAtividadeFisica().getFator();
 		usuario.setNecessidadeDiariaCalorias(Math.round(ndc));
 		
-		if(usuario.getObjetivo().equals(ObjetivoEnumModel.GANHO_PESO)) {
+		if(usuario.getObjetivo().equals(ObjetivoEnumModel.GANHAR_PESO)) {
 			usuario.adicionaCaloriaNdc(500);
-		} else if (usuario.getObjetivo().equals(ObjetivoEnumModel.PERDA_PESO)) {
+		} else if (usuario.getObjetivo().equals(ObjetivoEnumModel.PERDER_PESO)) {
 			usuario.adicionaCaloriaNdc(-500);
 		} else if (usuario.getObjetivo().equals(ObjetivoEnumModel.MANTER_PESO)) {
 			usuario.adicionaCaloriaNdc(0);

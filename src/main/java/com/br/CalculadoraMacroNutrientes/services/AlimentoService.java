@@ -85,7 +85,7 @@ public class AlimentoService {
 			return ResponseEntity.ok(new AlimentoDetalharDto(alimento));
 		} catch (AlimentoNaoEncontradoException e) {
 			log.error(e.getMessage());
-			return ResponseEntity.badRequest().body(e.getMessage());
+			return ResponseEntity.notFound().build();
 		}
 	}
 
@@ -103,7 +103,7 @@ public class AlimentoService {
 			return ResponseEntity.noContent().build();
 		} catch (AlimentoNaoEncontradoException e) {
 			log.error(e.getMessage());
-			return ResponseEntity.badRequest().body(e.getMessage());
+			return ResponseEntity.notFound().build();
 		}
     }
 

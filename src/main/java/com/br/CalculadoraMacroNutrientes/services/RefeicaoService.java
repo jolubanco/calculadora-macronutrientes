@@ -141,7 +141,7 @@ public class RefeicaoService {
 			return ResponseEntity.ok(new RefeicaoDetalharDto(refeicao));
 		} catch (RefeicaoNaoEncontradoException e) {
 			log.error(e.getMessage());
-			return ResponseEntity.badRequest().body(e.getMessage());
+			return ResponseEntity.notFound().build();
 		}
 
 	}
@@ -162,12 +162,10 @@ public class RefeicaoService {
 
 			log.info("Recalculando os macrosnutrientes da refeição");
 			subtraiMacrosDaRefeicao(refeicao,alimento);
-
 			if(idUsuario != null) {
 				log.info("Recalculando a distribuição dos macrosnutrientes do usuário");
 				adicionaMacrosDisponiveisDoUsuario(idUsuario,alimento);
 			}
-
 			refeicaoRepository.save(refeicao);
 			return ResponseEntity.noContent().build();
 		} catch (RefeicaoNaoEncontradoException | AlimentoNaoEncontradoException e) {
@@ -196,13 +194,12 @@ public class RefeicaoService {
 		try{
 			RefeicaoModel refeicao = refeicaoRepository.findById(idRefeicao)
 					.orElseThrow(() -> new RefeicaoNaoEncontradoException("Refeicao de id " + idRefeicao + " não encontrada"));
-
 			log.info("Deletando a refeição de id {}", refeicao.getId());
 			refeicaoRepository.delete(refeicao);
 			return ResponseEntity.noContent().build();
 		} catch (RefeicaoNaoEncontradoException e) {
 			log.error(e.getMessage());
-			return ResponseEntity.badRequest().body(e.getMessage());
+			return ResponseEntity.notFound().build();
 		}
 
 	}
