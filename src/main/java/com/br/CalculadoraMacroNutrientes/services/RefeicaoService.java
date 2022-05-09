@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.List;
 
 import com.br.CalculadoraMacroNutrientes.controllers.forms.RefeicaoUpdateForm;
+import com.br.CalculadoraMacroNutrientes.exceptions.AlimentoJaCadastradoNaRefeicaoException;
 import com.br.CalculadoraMacroNutrientes.exceptions.AlimentoNaoEncontradoException;
 import com.br.CalculadoraMacroNutrientes.exceptions.RefeicaoNaoEncontradoException;
 import com.br.CalculadoraMacroNutrientes.exceptions.UsuarioNaoEncontradoException;
@@ -55,19 +56,23 @@ public class RefeicaoService {
 			AlimentoModel alimento = alimentoRepository.findById(idAlimento)
 					.orElseThrow(() -> new AlimentoNaoEncontradoException("Alimento de id " + idAlimento + " não encontrado"));
 
-			log.info("Adicionando alimento na refeição");
-			refeicao.getAlimentos().add(alimento);
-			log.info("Recalculando os macrosnutrientes da refeição");
-			adicionaMacrosDaRefeicao(refeicao,alimento);
+			if(refeicao.getAlimentos().contains(alimento)){
+				throw new AlimentoJaCadastradoNaRefeicaoException("O alimento de id " + idAlimento + " já está cadastrado na refeição de id " + idRefeicao);
+			} else {
+				log.info("Adicionando alimento na refeição");
+				refeicao.getAlimentos().add(alimento);
+				log.info("Recalculando os macrosnutrientes da refeição");
+				adicionaMacrosDaRefeicao(refeicao,alimento);
 
-			if(idUsuario != null) {
-				log.info("Recalculando a distribuição dos macrosnutrientes do usuário");
-				subtraiMacrosDisponiveisDoUsuario(idUsuario,alimento);
+				if(idUsuario != null) {
+					log.info("Recalculando a distribuição dos macrosnutrientes do usuário");
+					subtraiMacrosDisponiveisDoUsuario(idUsuario,alimento);
+				}
+				return ResponseEntity.ok(new RefeicaoDto(refeicao));
 			}
-			return ResponseEntity.ok(new RefeicaoDto(refeicao));
-		} catch (RefeicaoNaoEncontradoException | AlimentoNaoEncontradoException e) {
+		} catch (RefeicaoNaoEncontradoException | AlimentoNaoEncontradoException | AlimentoJaCadastradoNaRefeicaoException e) {
 			log.error(e.getMessage());
-			return ResponseEntity.badRequest().body(e.getMessage());
+			return ResponseEntity.badRequest().build(); //deixar como BadRequest
 		}
 
 	}

@@ -19,13 +19,6 @@ public class UsuarioUpdateForm {
 	private Long id;
 	@NotNull @NotBlank
 	private String nome;
-	@NotNull @NotBlank
-	private String objetivo;
-	@NotNull
-	private double necessidadeDiariaCalorias;
-	@NotNull
-	//@Length(min = 2,max = 4)
-	private double peso;
 	@NotNull 
 	//@Length(min = 3,max = 6)
 	private double altura;
@@ -36,20 +29,18 @@ public class UsuarioUpdateForm {
 	private String sexo;
 	@NotNull @NotBlank
 	private String fatorAtividade;
-	@NotNull
-	private double taxaMetabolismoBasal;
 
 	public UsuarioModel converter(InformacoesUsuarioRepository informacoesUsuarioRepository) {
-		InformacoesUsuarioModel infoUsuario = new InformacoesUsuarioModel(peso,altura,idade, SexoEnum.valueOf(sexo), FatorAtividadeFisicaEnum.valueOf(fatorAtividade));
+		InformacoesUsuarioModel infoUsuario = new InformacoesUsuarioModel(altura,idade, SexoEnum.valueOf(sexo), FatorAtividadeFisicaEnum.valueOf(fatorAtividade));
 		informacoesUsuarioRepository.save(infoUsuario);
-		return new UsuarioModel(nome, ObjetivoEnumModel.valueOf(objetivo), infoUsuario);
+		return new UsuarioModel(nome, infoUsuario);
 	}
 
 	public InformacoesUsuarioModel converteInfomacoesUsuario() {
-		return new InformacoesUsuarioModel(peso,altura,idade,SexoEnum.valueOf(sexo),FatorAtividadeFisicaEnum.valueOf(fatorAtividade),taxaMetabolismoBasal);
+		return new InformacoesUsuarioModel(altura,idade,SexoEnum.valueOf(sexo),FatorAtividadeFisicaEnum.valueOf(fatorAtividade));
 	}
 
 	public UsuarioModel converterUsuario() {
-		return new UsuarioModel(id,nome,ObjetivoEnumModel.valueOf(objetivo),necessidadeDiariaCalorias);
+		return new UsuarioModel(id,nome);
 	}
 }

@@ -146,7 +146,7 @@ public class UsuarioService {
 			return ResponseEntity.noContent().build();
 		} catch (UsuarioNaoEncontradoException | RefeicaoNaoEncontradoException e) {
 			log.error(e.getMessage());
-			return ResponseEntity.badRequest().body(e.getMessage());
+			return ResponseEntity.notFound().build();
 		}
 	}
 
@@ -183,17 +183,25 @@ public class UsuarioService {
 				+ 4 * usuario.getDistribruicaoMacros().getProteina()
 				+ 9 * usuario.getDistribruicaoMacros().getGordura();
 		usuario.getDistribruicaoMacros().setConsumoCaloriasDisponivel(consumoCaloriasDisponiveis);
-		usuario.getRefeicoes().forEach(refeicao -> {
-			log.info("Atualizando calorias restantes");
-			atualizaCaloriasRestantesPorRefeicao(usuario,refeicao);
-			log.info("Atualizando os macros disponíveis");
-			atualizaDistribuicaoDosMacros(usuario,refeicao);
-		});
+		atualizandoMacrosDoUsuarioPorRefeicao(usuario);
+		atualizandoMacrosDoUsuarioPorExercicio(usuario);
+	}
+
+	private void atualizandoMacrosDoUsuarioPorExercicio(UsuarioModel usuario) {
 		usuario.getExercicios().forEach(exercicio -> {
 			log.info("Atualizando as calorias restantes");
 			atualizaCaloriasRestantesPorExercicio(usuario, exercicio);
 			log.info("Atualizando os macros");
 			atualizaCarboidratos(usuario, exercicio);
+		});
+	}
+
+	private void atualizandoMacrosDoUsuarioPorRefeicao(UsuarioModel usuario) {
+		usuario.getRefeicoes().forEach(refeicao -> {
+			log.info("Atualizando calorias restantes");
+			atualizaCaloriasRestantesPorRefeicao(usuario,refeicao);
+			log.info("Atualizando os macros disponíveis");
+			atualizaDistribuicaoDosMacros(usuario,refeicao);
 		});
 	}
 
@@ -221,7 +229,7 @@ public class UsuarioService {
 			return ResponseEntity.noContent().build();
 		} catch (UsuarioNaoEncontradoException | ExercicioNaoEncontradoException e) {
 			log.error(e.getMessage());
-			return ResponseEntity.badRequest().body(e.getMessage());
+			return ResponseEntity.notFound().build();
 		}
 	}
 
@@ -233,8 +241,6 @@ public class UsuarioService {
 		log.info("Atualizando os macros");
 		atualizaCarboidratos(usuario, exercicio);
 	}
-	//calorias restantes
-	//carboidrato e carboidratodisponivel
 
 	private void atualizaCarboidratos(UsuarioModel usuario, ExercicioModel exercicio) {
 		usuario.getDistribruicaoMacros().adicionaCarboidratosDisponivelAPartirDaCaloria(exercicio.getCaloriasGastas());
@@ -268,7 +274,7 @@ public class UsuarioService {
 			return ResponseEntity.noContent().build();
 		} catch (UsuarioNaoEncontradoException e) {
 			log.error(e.getMessage());
-			return ResponseEntity.badRequest().body(e.getMessage());
+			return ResponseEntity.notFound().build();
 		}
 	}
 
@@ -277,10 +283,13 @@ public class UsuarioService {
 			UsuarioModel usuario = usuarioRepository.findById(form.getId())
 					.orElseThrow(() -> new UsuarioNaoEncontradoException("Usuario de id " + form.getId() + " não encontrado"));
 			UsuarioModel usuarioConvertido = cadastraDadosUsuarioQueEstaSendoAtualizado(form, usuario);
-			log.info("Atualizando usuário de id {}",usuario.getId());
-			// atualizar as informações do usuario (mais complexo)
 
-			//
+			log.info("Recalculado as informações do usuário");
+			calculandoDadosDoUsuario(usuarioConvertido);
+			atualizandoMacrosDoUsuarioPorRefeicao(usuarioConvertido);
+			atualizandoMacrosDoUsuarioPorExercicio(usuarioConvertido);
+
+			log.info("Atualizando usuário de id {}",usuario.getId());
 			usuarioRepository.save(usuarioConvertido);
 
 			log.info("Atualizando a tabela de histórico de peso");
@@ -293,18 +302,18 @@ public class UsuarioService {
 			return ResponseEntity.noContent().build();
 		} catch (UsuarioNaoEncontradoException e) {
 			log.error(e.getMessage());
-			return ResponseEntity.badRequest().body(e.getMessage());
+			return ResponseEntity.notFound().build();
 		}
 	}
 
 	private UsuarioModel cadastraDadosUsuarioQueEstaSendoAtualizado(UsuarioUpdateForm form, UsuarioModel usuario) {
-		InformacoesUsuarioModel info = form.converteInfomacoesUsuario(); //verificar se nao vai dar conflito pelo id
+		InformacoesUsuarioModel info = form.converteInfomacoesUsuario();
 		informacoesUsuarioRepository.save(info);
 		UsuarioModel usuarioConvertido = form.converterUsuario();
 		log.info("Definindo informaçõs do usuário");
 		usuarioConvertido.setInformacoesUsuario(info);
-		log.info("Definindo distribuição dos macros");
-		usuarioConvertido.setDistribruicaoMacros(usuario.getDistribruicaoMacros());
+		usuarioConvertido.setObjetivo(usuario.getObjetivo());
+		usuarioConvertido.getInformacoesUsuario().setPeso(usuario.getInformacoesUsuario().getPeso());
 		log.info("Definindo refeições");
 		usuarioConvertido.setRefeicoes(usuario.getRefeicoes());
 		log.info("Definindo exercícios");
@@ -334,7 +343,7 @@ public class UsuarioService {
 			return ResponseEntity.noContent().build();
 		} catch (UsuarioNaoEncontradoException e) {
 			log.error(e.getMessage());
-			return ResponseEntity.badRequest().body(e.getMessage());
+			return ResponseEntity.notFound().build();
 		}
 	}
 
@@ -360,15 +369,14 @@ public class UsuarioService {
 			log.info("Removendo exercicio de id {}, caso exista",idExercicio);
 			exercicios.removeIf(exercicio -> exercicio.getId().equals(idExercicio));
 
-			//atualiza os macros
 			log.info("Atualizando informações do usuário");
 			atualizandoInformacoesAPartirDaRemocaoDoExercicio(exercicioASerExcluido,usuario);
-			//
+
 			usuarioRepository.save(usuario);
 			return ResponseEntity.noContent().build();
 		} catch (UsuarioNaoEncontradoException e) {
 			log.info(e.getMessage());
-			return ResponseEntity.badRequest().body(e.getMessage());
+			return ResponseEntity.notFound().build();
 		}
 	}
 
