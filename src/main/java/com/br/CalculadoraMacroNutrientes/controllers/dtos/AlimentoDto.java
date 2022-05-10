@@ -17,7 +17,7 @@ public class AlimentoDto {
 	public AlimentoDto(AlimentoModel alimento) {
 		this.id = alimento.getId();
 		this.nome = alimento.getNome();
-		this.calorias = alimento.getCalorias();
+		this.calorias = Math.round(alimento.getCalorias());
 	}
 
 	public static List<AlimentoDto> converter(List<AlimentoModel> alimentos) {

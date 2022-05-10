@@ -25,10 +25,10 @@ public class RefeicaoDetalharDto {
 	public RefeicaoDetalharDto(RefeicaoModel refeicao) {
 		this.id = refeicao.getId();
 		this.nome = refeicao.getNome();
-		this.caloriasTotais = refeicao.getCaloriasTotais();
-		this.proteinasTotais = refeicao.getProteinasTotais();
-		this.carboidratosTotais = refeicao.getCarboidratosTotais();
-		this.gordurasTotais = refeicao.getGordurasTotais();
+		this.caloriasTotais = Math.round(refeicao.getCaloriasTotais());
+		this.proteinasTotais = Math.round(refeicao.getProteinasTotais());
+		this.carboidratosTotais = Math.round(refeicao.getCarboidratosTotais());
+		this.gordurasTotais = Math.round(refeicao.getGordurasTotais());
 		this.dataCriacao = refeicao.getDataCriacao();
 		this.alimentos = AlimentoDto.converter(refeicao.getAlimentos());
 	}

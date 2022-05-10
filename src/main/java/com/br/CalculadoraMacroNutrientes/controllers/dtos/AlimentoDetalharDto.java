@@ -19,9 +19,9 @@ public class AlimentoDetalharDto {
 		this.id = alimento.getId();
 		this.nome = alimento.getNome();
 		this.quantidade = alimento.getQuantidade();
-		this.carboidrato = alimento.getCarboidrato();
-		this.proteina = alimento.getProteina();
-		this.gordura = alimento.getGordura();
-		this.calorias = alimento.getCalorias();
+		this.carboidrato = Math.round(alimento.getCarboidrato());
+		this.proteina = Math.round(alimento.getProteina());
+		this.gordura = Math.round(alimento.getGordura());
+		this.calorias = Math.round(alimento.getCalorias());
 	}
 }

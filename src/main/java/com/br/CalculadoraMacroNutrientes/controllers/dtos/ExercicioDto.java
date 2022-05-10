@@ -17,7 +17,7 @@ public class ExercicioDto {
 	public ExercicioDto(ExercicioModel exercicio) {
 		this.id = exercicio.getId();
 		this.modalidade = exercicio.getModalidade();
-		this.caloriaGasta = exercicio.getCaloriasGastas();
+		this.caloriaGasta = Math.round(exercicio.getCaloriasGastas());
 	}
 
 	public static List<ExercicioDto> converter(List<ExercicioModel> exercicios) {

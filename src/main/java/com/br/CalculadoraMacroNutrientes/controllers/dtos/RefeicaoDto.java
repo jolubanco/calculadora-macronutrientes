@@ -22,14 +22,8 @@ public class RefeicaoDto {
 	public RefeicaoDto(RefeicaoModel refeicao) {
 		this.id= refeicao.getId();
 		this.nome = refeicao.getNome();
-		this.caloriasTotais = refeicao.getCaloriasTotais();
+		this.caloriasTotais = Math.round(refeicao.getCaloriasTotais());
 		this.dataCriacao = refeicao.getDataCriacao();
-	}
-
-	public RefeicaoDto(String nome, double caloriasTotais, LocalDate dataCriacao) {
-		this.nome = nome;
-		this.caloriasTotais = caloriasTotais;
-		this.dataCriacao = dataCriacao;
 	}
 
 	public static List<RefeicaoDto> converter(List<RefeicaoModel> refeicoes) {

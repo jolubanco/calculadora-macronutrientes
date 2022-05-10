@@ -18,7 +18,7 @@ public class AlimentoDominioDto {
 	public AlimentoDominioDto(AlimentoDominio alimento) {
 		this.id = alimento.getId();
 		this.nome = alimento.getNome();
-		this.calorias = alimento.getCalorias();
+		this.calorias = Math.round(alimento.getCalorias());
 	}
 
 	public static List<AlimentoDominioDto> converter(List<AlimentoDominio> alimentos) {

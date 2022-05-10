@@ -16,7 +16,7 @@ public class ExercicioDetalharDto {
 		this.id = exercicio.getId();
 		this.modalidade = exercicio.getModalidade();
 		this.tempo = exercicio.getTempo();
-		this.caloriasGastas = exercicio.getCaloriasGastas();
+		this.caloriasGastas = Math.round(exercicio.getCaloriasGastas());
 	}
 
 

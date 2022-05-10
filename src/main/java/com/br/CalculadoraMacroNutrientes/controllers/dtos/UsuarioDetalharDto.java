@@ -24,7 +24,7 @@ public class UsuarioDetalharDto {
 		this.id = usuario.getId();
 		this.nome = usuario.getNome();
 		this.objetivo = usuario.getObjetivo().name();
-		this.necessidadeDiariaCalorias = usuario.getNecessidadeDiariaCalorias();
+		this.necessidadeDiariaCalorias = Math.round(usuario.getNecessidadeDiariaCalorias());
 		this.informacoesUsuario = usuario.getInformacoesUsuario().converterDto();
 		this.distribruicaoMacros = usuario.getDistribruicaoMacros().converterDto();
 		this.refeicoes = RefeicaoModel.converterDto(usuario.getRefeicoes()); //testar
