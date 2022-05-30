@@ -64,10 +64,10 @@ public class UsuarioService {
 
 		if (usuario.getInformacoesUsuario().getSexo().equals(SexoEnum.MASCULINO)) {
 			double tmbMasculino = 66 + ((13.7 * peso) + (5 * altura) - (6.8 * idade));
-			usuario.getInformacoesUsuario().setTaxaMetabolismoBasal(Math.round(tmbMasculino));
+			usuario.getInformacoesUsuario().setTaxaMetabolismoBasal(tmbMasculino);
 		} else if (usuario.getInformacoesUsuario().getSexo().equals(SexoEnum.FEMININO)) {
 			double tmbFeminino = 655 + ((9.6 * peso) + (1.8 * altura) - (4.7 * idade));
-			usuario.getInformacoesUsuario().setTaxaMetabolismoBasal(Math.round(tmbFeminino));
+			usuario.getInformacoesUsuario().setTaxaMetabolismoBasal(tmbFeminino);
 		}
 	}
 
@@ -122,7 +122,7 @@ public class UsuarioService {
 		double gordura = 1 * usuario.getInformacoesUsuario().getPeso();
 
 		double caloriasRestante = caloriasLimite - (proteina * 4 + gordura * 9);
-		double carboidrato = Math.round(caloriasRestante/4);
+		double carboidrato = caloriasRestante/4;
 
 		DistribuicaoMacrosModel distribuicaoMacros = new DistribuicaoMacrosModel(carboidrato,proteina,gordura);
 		distribuicaoMacrosRepository.save(distribuicaoMacros);
@@ -254,7 +254,7 @@ public class UsuarioService {
 		
 		double basal = usuario.getInformacoesUsuario().getTaxaMetabolismoBasal();
 		double ndc = basal * usuario.getInformacoesUsuario().getFatorAtividadeFisica().getFator();
-		usuario.setNecessidadeDiariaCalorias(Math.round(ndc));
+		usuario.setNecessidadeDiariaCalorias(ndc);
 		
 		if(usuario.getObjetivo().equals(ObjetivoEnumModel.GANHAR_PESO)) {
 			usuario.adicionaCaloriaNdc(500);
@@ -493,7 +493,7 @@ public class UsuarioService {
 	private void recalculaDistribuicaoDeCarboidrato(UsuarioModel usuario) {
 		double ndc = usuario.getNecessidadeDiariaCalorias();
 		double caloriasDisponiveis = ndc - (usuario.getDistribruicaoMacros().getProteina() * 4 + usuario.getDistribruicaoMacros().getGordura() * 9);
-		double carboidrato = Math.round(caloriasDisponiveis/4);
+		double carboidrato = caloriasDisponiveis/4;
 		usuario.getDistribruicaoMacros().setCarboidrato(carboidrato);
 	}
 
@@ -504,7 +504,7 @@ public class UsuarioService {
 		double gordura = 1 * usuario.getInformacoesUsuario().getPeso();
 
 		double caloriasDisponiveis = ndc - (proteina * 4 + gordura * 9);
-		double carboidrato = Math.round(caloriasDisponiveis/4);
+		double carboidrato = caloriasDisponiveis/4;
 
 		usuario.getDistribruicaoMacros().setCarboidrato(carboidrato);
 		usuario.getDistribruicaoMacros().setProteina(proteina);
